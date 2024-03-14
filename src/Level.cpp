@@ -84,7 +84,7 @@ void Level::draw(sf::RenderWindow &window) {
     }
 }
 
-bool Level::isLegalMove(int x, int y) {
+bool Level::isEmpty(int x, int y) {
     // out of bounds
     if (x < 0 || y < 0 || x >= width || y >= height) {
         return false;
@@ -98,4 +98,16 @@ bool Level::isLegalMove(int x, int y) {
         return false;
     }
     return true;
+}
+
+bool Level::isDestroyable(int x, int y) {
+    // out of bounds
+    if (x < 0 || y < 0 || x >= width || y >= height) {
+        return false;
+    }
+    // Breakable wall
+    if(levelData[y][x] == '.') {
+        return true;
+    }
+    return false;
 }

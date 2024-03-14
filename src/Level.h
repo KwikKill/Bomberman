@@ -19,10 +19,10 @@ public:
     void load(int levelNumber);
     void draw(sf::RenderWindow &window);
 
-    bool isLegalMove(int x, int y);
-
+    bool isEmpty(int x, int y);
+    bool isDestroyable(int x, int y);
     void destroyWall(int x, int y) {
-        levelData[y][x] = '.';
+        levelData[y][x] = ' ';
     }
 
     size_t getWidth() const { return width; }

@@ -69,17 +69,25 @@ void Game::processEvents()
         if (event.type == sf::Event::Closed)
             window.close();
         else if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Up && level.isLegalMove(players[0].getX(), players[0].getY() - 1)) {
-                players[0].move(0, -1);
+            if (event.key.code == sf::Keyboard::Up) {
+                if(isLegalMove(players[0].getX(), players[0].getY() - 1)) {
+                    players[0].move(0, -1);
+                }
                 hasMoved = true;
-            } else if (event.key.code == sf::Keyboard::Down && level.isLegalMove(players[0].getX(), players[0].getY() + 1)) {
-                players[0].move(0, 1);
+            } else if (event.key.code == sf::Keyboard::Down) {
+                if(isLegalMove(players[0].getX(), players[0].getY() + 1)) {
+                    players[0].move(0, 1);
+                }
                 hasMoved = true;
-            } else if (event.key.code == sf::Keyboard::Left && level.isLegalMove(players[0].getX() - 1, players[0].getY())) {
-                players[0].move(-1, 0);
+            } else if (event.key.code == sf::Keyboard::Left) {
+                if(isLegalMove(players[0].getX() - 1, players[0].getY())) {
+                    players[0].move(-1, 0);
+                }
                 hasMoved = true;
-            } else if (event.key.code == sf::Keyboard::Right && level.isLegalMove(players[0].getX() + 1, players[0].getY())) {
-                players[0].move(1, 0);
+            } else if (event.key.code == sf::Keyboard::Right) {
+                if(isLegalMove(players[0].getX() + 1, players[0].getY())) {
+                    players[0].move(1, 0);
+                }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Space) {
                 if(players[0].dropBomb()) {
@@ -89,7 +97,8 @@ void Game::processEvents()
                         players[0].getY(),
                         DEFAULT_BOMB_TIMER,
                         players[0].getStrength(),
-                        "assets/img/bomb1.png"
+                        "assets/img/bomb1.png",
+                        &players[0]
                     );
                     numBombs++;
                 }
@@ -100,8 +109,27 @@ void Game::processEvents()
 
 void Game::update()
 {
+    // Update the players
     for (int i = 0; i < 2; ++i) {
         players[i].update();
+    }
+
+    // Update the bombs
+    for (int i = 0; i < numBombs; ++i) {
+        std::cout << bombs[i].getTimeLeft() << std::endl;
+        if(bombs[i].getTimeLeft() > 0) {
+            bombs[i].update();
+        } else {
+            // Explode the bomb
+            bombs[i].explode(level, players, 2);
+            // add a bomb to the player
+            bombs[i].getOwner()->addBomb();
+            // Remove the bomb
+            for (int j = i; j < numBombs - 1; ++j) {
+                bombs[j] = bombs[j + 1];
+            }
+            numBombs--;
+        }
     }
 }
 
@@ -119,4 +147,17 @@ void Game::render()
     for (int i = 0; i < numBombs; ++i) {
         bombs[i].draw(window);
     }
+}
+
+bool Game::isLegalMove(int x, int y) {
+    if(level.isEmpty(x, y)) {
+        // Check if there is a bomb at the position
+        for (int i = 0; i < numBombs; ++i) {
+            if (bombs[i].getX() == x && bombs[i].getY() == y) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }

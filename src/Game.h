@@ -30,6 +30,8 @@ private:
     Bomb bombs[MAX_BOMBS];
     int numBombs;
 
+    bool isLegalMove(int x, int y);
+
 public:
     void load();
     void run();

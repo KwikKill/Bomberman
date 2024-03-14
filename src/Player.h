@@ -33,12 +33,14 @@ public:
     void draw(sf::RenderWindow &window);
     void move(int dx, int dy);
     void update();
+    void die();
     bool dropBomb();
     int getX() const { return x; }
     int getY() const { return y; }
 
     int getStrength() const { return strength; }
     int getNumBombs() const { return numBombs; }
+    void addBomb() { numBombs++; }
 };
 
 #endif // LEVEL_P

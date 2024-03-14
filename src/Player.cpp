@@ -52,3 +52,8 @@ bool Player::dropBomb() {
     }
     return false;
 }
+
+void Player::die() {
+    // handle player death
+    std::cout << "Player died!" << std::endl;
+}

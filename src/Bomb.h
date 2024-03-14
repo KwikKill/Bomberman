@@ -21,12 +21,15 @@ private:
 
 public:
     Bomb();
-    Bomb(int x, int y, int timer, int strength, std::string texturePath);
+    Bomb(int x, int y, int timer, int strength, std::string texturePath, Player *owner);
     void draw(sf::RenderWindow &window);
-    void explode(Level &level);
+    void explode(Level &level, Player *players, int numPlayers);
+    void update();
     int getX() const { return x; }
     int getY() const { return y; }
     int getTimeLeft() const { return time_left; }
+    int getStrength() const { return strength; }
+    Player *getOwner() const { return owner; }
 };
 
 #endif // BOMB_H
