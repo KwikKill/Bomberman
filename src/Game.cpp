@@ -55,14 +55,34 @@ void Game::run()
         if (winner == NO_WINNER) {
             hasMoved = false;
             processEvents();
+        if (winner == NO_WINNER) {
+            hasMoved = false;
+            processEvents();
 
+            window.clear(sf::Color::Black); // Clear the window with black color
             window.clear(sf::Color::Black); // Clear the window with black color
 
             render();
             if (hasMoved) {
                 update();
             }
+            render();
+            if (hasMoved) {
+                update();
+            }
 
+            window.display(); // End the current frame and display everything
+        } else {
+            std::cout << "The winner is: ";
+            if (winner == PLAYER1) {
+                std::cout << "Player 1" << std::endl;
+            } else if (winner == PLAYER2) {
+                std::cout << "Player 2" << std::endl;
+            } else {
+                std::cout << "Nobody" << std::endl;
+            }
+            window.close();
+        }
             window.display(); // End the current frame and display everything
         } else {
             std::cout << "The winner is: ";
@@ -146,7 +166,7 @@ void Game::update()
             std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
 
             // Add the flames to the list of flames
-            for (int j = 0; j < flamePositions.size(); ++j) {
+            for (long unsigned j = 0; j < flamePositions.size(); ++j) {
                 flames.push_back(
                     Flame(flamePositions[j].first, flamePositions[j].second)
                 );
@@ -164,10 +184,10 @@ void Game::update()
         explosion = false;
         for (int i = bombs.size() - 1; i >= 0; --i) {
             // if the bomb is on a flame, explode it
-            for (int j = 0; j < flames.size(); ++j) {
+            for (long unsigned j = 0; j < flames.size(); ++j) {
                 if (bombs[i].getX() == flames[j].getX() && bombs[i].getY() == flames[j].getY()) {
                     std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
-                    for (int j = 0; j < flamePositions.size(); ++j) {
+                    for (long unsigned j = 0; j < flamePositions.size(); ++j) {
                         flames.push_back(
                             Flame(flamePositions[j].first, flamePositions[j].second)
                         );
@@ -218,17 +238,17 @@ void Game::render()
     }
 
     // Draw the bonuses
-    for (int i = 0; i < bonuses.size(); ++i) {
+    for (long unsigned i = 0; i < bonuses.size(); ++i) {
         bonuses[i].draw(window);
     }
 
     // Draw the bombs
-    for (int i = 0; i < bombs.size(); ++i) {
+    for (long unsigned i = 0; i < bombs.size(); ++i) {
         bombs[i].draw(window);
     }
 
     // Draw the flames
-    for (int i = 0; i < flames.size(); ++i) {
+    for (long unsigned i = 0; i < flames.size(); ++i) {
         flames[i].draw(window);
     }
 }
@@ -236,7 +256,7 @@ void Game::render()
 bool Game::isLegalMove(int x, int y) {
     if(level.isEmpty(x, y)) {
         // Check if there is a bomb at the position
-        for (int i = 0; i < bombs.size(); ++i) {
+        for (long unsigned i = 0; i < bombs.size(); ++i) {
             if (bombs[i].getX() == x && bombs[i].getY() == y) {
                 return false;
             }
@@ -253,7 +273,7 @@ bool Game::isLegalMove(int x, int y) {
 }
 
 void Game::PlayerCheckBonus(Player &player) {
-    for (int i = 0; i < bonuses.size(); ++i) {
+    for (long unsigned i = 0; i < bonuses.size(); ++i) {
         if (player.getX() == bonuses[i].getX() && player.getY() == bonuses[i].getY()) {
             player.addBonus(bonuses[i].getType());
             bonuses.erase(bonuses.begin() + i);

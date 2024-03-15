@@ -29,8 +29,8 @@ void Level::load(unsigned int levelNumber) {
     }
 
     // Find a random "S" tile to spawn the player
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
+    for (size_t i = 0; i < height; ++i) {
+        for (size_t j = 0; j < width; ++j) {
             if (levelData[i][j] == 'S') {
                 spawnPositions.push_back(std::make_pair(j, i));
             }
@@ -60,8 +60,8 @@ void Level::draw(sf::RenderWindow &window) {
     sf::Sprite voidsprite;
     voidsprite.setTexture(Voidtexture);
 
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        for (int j = 0; j < levelData[i].size(); ++j) {
+    for (long unsigned i = 0; i < MAX_SIZE; ++i) {
+        for (long unsigned j = 0; j < levelData[i].size(); ++j) {
             if (levelData[i][j] == 'X') {
                 wall1sprite.setPosition(
                     j * wall1texture.getSize().x,
@@ -87,7 +87,7 @@ void Level::draw(sf::RenderWindow &window) {
 
 bool Level::isEmpty(int x, int y) {
     // out of bounds
-    if (x < 0 || y < 0 || x >= width || y >= height) {
+    if (x < 0 || y < 0 || x >= (int) width || y >= (int) height) {
         return false;
     }
     // Umbreakable wall
@@ -103,7 +103,7 @@ bool Level::isEmpty(int x, int y) {
 
 bool Level::isDestroyable(int x, int y) {
     // out of bounds
-    if (x < 0 || y < 0 || x >= width || y >= height) {
+    if (x < 0 || y < 0 || x >= (int) width || y >= (int) height) {
         return false;
     }
     // Breakable wall

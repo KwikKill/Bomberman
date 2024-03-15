@@ -24,7 +24,7 @@ Bomb::Bomb(int x, int y, int timer, int strength, Player *owner) {
 
     std::cout << "Time left : " << time_left << std::endl;
     std::cout << "Size : " << bombTextures->size() << std::endl;
-    if (time_left > bombTextures->size() - 1) {
+    if (time_left > (int) bombTextures->size() - 1) {
         time_left = bombTextures->size() - 1;
     }
     std::string texturePath = bombTextures->at(time_left);
@@ -100,7 +100,7 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
 }
 
 void Bomb::changeTexture() {
-    if (time_left > bombTextures->size() - 1) {
+    if (time_left > (int) bombTextures->size() - 1) {
         if (!texture.loadFromFile(bombTextures->at(bombTextures->size() - 1))) {
             // handle error
         }
