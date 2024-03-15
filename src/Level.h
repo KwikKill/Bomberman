@@ -16,7 +16,7 @@ private:
     std::vector<std::pair<int, int>> spawnPositions;
 
 public:
-    void load(int levelNumber);
+    void load(unsigned int levelNumber);
     void draw(sf::RenderWindow &window);
 
     bool isEmpty(int x, int y);

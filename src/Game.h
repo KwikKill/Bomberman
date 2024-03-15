@@ -9,8 +9,16 @@
 #include "Bonus.h"
 
 #define TILE_SIZE 64
-#define MAX_BOMBS 100
-#define MAX_BONUSES 100
+
+#define BONUS_SPAWN_CHANCE 15
+
+enum Winner
+{
+    PLAYER1,
+    PLAYER2,
+    DRAW,
+    NO_WINNER
+};
 
 class Game
 {
@@ -31,17 +39,18 @@ private:
     bool isLegalMove(int x, int y);
 
     // Array of bombs
-    Bomb bombs[MAX_BOMBS];
-    int numBombs;
+    std::vector<Bomb> bombs;
 
     // Array of bonuses
-    Bonus bonuses[MAX_BONUSES];
-    int numBonuses;
+    std::vector<Bonus> bonuses;
 
     void PlayerCheckBonus(Player &player);
 
+    Winner winner;
+
 public:
-    void load();
+    Game();
+    void load(unsigned int level_nb);
     void run();
 };
 

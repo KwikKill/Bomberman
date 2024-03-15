@@ -56,6 +56,7 @@ bool Player::dropBomb() {
 void Player::die() {
     // handle player death
     std::cout << "Player died!" << std::endl;
+    
 }
 
 void Player::addBonus(int type) {

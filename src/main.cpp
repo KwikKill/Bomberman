@@ -9,7 +9,7 @@ int main()
     // Print a message to the console
     std::cout << "Game starting" << std::endl;
     Game game;
-    game.load();
+    game.load(1);
     std::cout << "Game loaded" << std::endl;
     game.run();
     std::cout << "Game finished" << std::endl;

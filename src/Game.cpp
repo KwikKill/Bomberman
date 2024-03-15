@@ -6,9 +6,15 @@
 #include "Bomb.h"
 #include "Bonus.h"
 
-void Game::load() {
+Game::Game() {
+    hasMoved = false;
+    winner = NO_WINNER;
+    level = Level();
+}
+
+void Game::load(unsigned int level_nb) {
     // Create a new level
-    level.load(1);
+    level.load(level_nb);
 
     // Create a window of the right size
     window.create(
@@ -40,9 +46,6 @@ void Game::load() {
         "assets/img/ai.png",
         AI
     );
-
-    numBombs = 0;
-    numBonuses = 0;
 }
 
 void Game::run()
@@ -100,15 +103,14 @@ void Game::processEvents()
             } else if (event.key.code == sf::Keyboard::Space) {
                 if(players[0].dropBomb()) {
                     // Create a new bomb
-                    bombs[numBombs] = Bomb(
+                    bombs.push_back(Bomb(
                         players[0].getX(),
                         players[0].getY(),
                         DEFAULT_BOMB_TIMER,
                         players[0].getStrength(),
                         "assets/img/bomb1.png",
                         &players[0]
-                    );
-                    numBombs++;
+                    ));
                 }
             }
         }
@@ -123,20 +125,17 @@ void Game::update()
     }
 
     // Update the bombs
-    for (int i = 0; i < numBombs; ++i) {
+    for (int i = 0; i < bombs.size(); ++i) {
         std::cout << bombs[i].getTimeLeft() << std::endl;
         if(bombs[i].getTimeLeft() > 0) {
             bombs[i].update();
         } else {
             // Explode the bomb
-            bombs[i].explode(level, players, 2, bonuses, &numBonuses);
+            bombs[i].explode(level, players, 2, bonuses);
             // add a bomb to the player
             bombs[i].getOwner()->addBomb();
             // Remove the bomb
-            for (int j = i; j < numBombs - 1; ++j) {
-                bombs[j] = bombs[j + 1];
-            }
-            numBombs--;
+            bombs.erase(bombs.begin() + i);
         }
     }
 }
@@ -152,12 +151,12 @@ void Game::render()
     }
 
     // Draw the bonuses
-    for (int i = 0; i < numBonuses; ++i) {
+    for (int i = 0; i < bonuses.size(); ++i) {
         bonuses[i].draw(window);
     }
 
     // Draw the bombs
-    for (int i = 0; i < numBombs; ++i) {
+    for (int i = 0; i < bombs.size(); ++i) {
         bombs[i].draw(window);
     }
 }
@@ -165,7 +164,7 @@ void Game::render()
 bool Game::isLegalMove(int x, int y) {
     if(level.isEmpty(x, y)) {
         // Check if there is a bomb at the position
-        for (int i = 0; i < numBombs; ++i) {
+        for (int i = 0; i < bombs.size(); ++i) {
             if (bombs[i].getX() == x && bombs[i].getY() == y) {
                 return false;
             }
@@ -176,13 +175,10 @@ bool Game::isLegalMove(int x, int y) {
 }
 
 void Game::PlayerCheckBonus(Player &player) {
-    for (int i = 0; i < numBonuses; ++i) {
+    for (int i = 0; i < bonuses.size(); ++i) {
         if (player.getX() == bonuses[i].getX() && player.getY() == bonuses[i].getY()) {
             player.addBonus(bonuses[i].getType());
-            for (int j = i; j < numBonuses - 1; ++j) {
-                bonuses[j] = bonuses[j + 1];
-            }
-            numBonuses--;
+            bonuses.erase(bonuses.begin() + i);
         }
     }
 }

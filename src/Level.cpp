@@ -5,7 +5,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-void Level::load(int levelNumber) {
+void Level::load(unsigned int levelNumber) {
 
     std::string filePath = "assets/levels/" + std::to_string(levelNumber) + ".txt";
     std::ifstream file(filePath);

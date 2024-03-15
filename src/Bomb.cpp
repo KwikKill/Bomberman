@@ -35,7 +35,7 @@ void Bomb::update() {
     time_left--;
 }
 
-void Bomb::explode(Level &level, Player *players, int numPlayers, Bonus *bonuses, int *numBonuses) {
+void Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses) {
     // explode in all 4 directions
     for (int i = 0; i < 4; ++i) {
         for (int j = 1; j <= strength; ++j) {
@@ -56,11 +56,12 @@ void Bomb::explode(Level &level, Player *players, int numPlayers, Bonus *bonuses
 
             if (level.isDestroyable(new_x, new_y)) {
                 level.destroyWall(new_x, new_y);
-                if (rand() % 100 < 20) {
+                if (rand() % 100 < BONUS_SPAWN_CHANCE) {
                     std::cout << "Bonus " << new_x << " " << new_y << std::endl;
-                    bonuses[*numBonuses] = Bonus(new_x, new_y, Bonus::getRandomType());
-                    (*numBonuses)++;
-                    std::cout << "Bonus : " << numBonuses << std::endl;
+                    bonuses.push_back(
+                        Bonus(new_x, new_y, Bonus::getRandomType())
+                    );
+                    std::cout << "Bonus : " << bonuses.size() << std::endl;
                 }
                 break;
             } else {

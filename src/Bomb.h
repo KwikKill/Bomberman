@@ -24,7 +24,7 @@ public:
     Bomb();
     Bomb(int x, int y, int timer, int strength, std::string texturePath, Player *owner);
     void draw(sf::RenderWindow &window);
-    void explode(Level &level, Player *players, int numPlayers, Bonus *bonuses, int *numBonuses);
+    void explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses);
     void update();
     int getX() const { return x; }
     int getY() const { return y; }
