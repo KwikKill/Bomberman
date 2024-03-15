@@ -47,6 +47,6 @@ void HUD::draw(sf::RenderWindow &window, Game &game) {
     text4.setCharacterSize(24);
     text4.setFillColor(sf::Color::White);
     text4.setPosition(200, window.getSize().y - HUD_HEIGHT + 25);
-    text4.setString("Strenght: " + std::to_string(game.getPlayers()[0].getStrength()));
+    text4.setString("Strenght: " + std::to_string(game.getPlayers()[1].getStrength()));
     window.draw(text4);
 }

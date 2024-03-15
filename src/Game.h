@@ -49,8 +49,6 @@ private:
     // Array of flames
     std::vector<Flame> flames;
 
-    void PlayerCheckBonus(Player &player);
-
     Winner winner;
 
     float zoom;
@@ -65,6 +63,8 @@ public:
     std::vector<Bomb> &getBombs() { return bombs; }
 
     bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
+
+    void PlayerCheckBonus(Player &player);
 };
 
 #endif // GAME_H

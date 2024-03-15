@@ -106,25 +106,21 @@ void Game::processEvents()
             if (event.key.code == sf::Keyboard::Up) {
                 if(isLegalMove(players[0].getX(), players[0].getY() - 1)) {
                     players[0].move(0, -1);
-                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Down) {
                 if(isLegalMove(players[0].getX(), players[0].getY() + 1)) {
                     players[0].move(0, 1);
-                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Left) {
                 if(isLegalMove(players[0].getX() - 1, players[0].getY())) {
                     players[0].move(-1, 0);
-                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Right) {
                 if(isLegalMove(players[0].getX() + 1, players[0].getY())) {
                     players[0].move(1, 0);
-                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Space) {
@@ -149,6 +145,7 @@ void Game::update()
     // Update the players
     for (int i = 0; i < 2; ++i) {
         players[i].update(*this);
+        PlayerCheckBonus(players[i]);
     }
 
     // Update the bombs
