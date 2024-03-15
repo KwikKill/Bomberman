@@ -13,4 +13,5 @@ int main()
     std::cout << "Game loaded" << std::endl;
     game.run();
     std::cout << "Game finished" << std::endl;
+    exit(0);
 }
