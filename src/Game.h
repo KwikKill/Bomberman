@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Bomb.h"
 #include "Bonus.h"
+#include "Flame.h"
 
 #define TILE_SIZE 64
 
@@ -43,6 +44,9 @@ private:
 
     // Array of bonuses
     std::vector<Bonus> bonuses;
+
+    // Array of flames
+    std::vector<Flame> flames;
 
     void PlayerCheckBonus(Player &player);
 

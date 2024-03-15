@@ -48,7 +48,12 @@ void Bomb::update() {
     time_left--;
 }
 
-void Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses) {
+std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses) {
+    std::vector<std::pair<int, int>> flamePositions;
+
+    // Add flame position for the bomb itself
+    flamePositions.push_back(std::make_pair(x, y));
+
     // explode in all 4 directions
     for (int i = 0; i < 4; ++i) {
         for (int j = 1; j <= strength; ++j) {
@@ -76,6 +81,7 @@ void Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bo
                     );
                     std::cout << "Bonus : " << bonuses.size() << std::endl;
                 }
+                flamePositions.push_back(std::make_pair(new_x, new_y));
                 break;
             } else {
                 for (int k = 0; k < numPlayers; ++k) {
@@ -86,11 +92,11 @@ void Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bo
                 if (level.isundestroyWall(new_x, new_y)) {
                     break;
                 }
+                flamePositions.push_back(std::make_pair(new_x, new_y));
             }
         }
     }
-
-    
+    return flamePositions;
 }
 
 void Bomb::changeTexture() {

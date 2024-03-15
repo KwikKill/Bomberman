@@ -131,11 +131,31 @@ void Game::update()
             bombs[i].changeTexture();
         } else {
             // Explode the bomb
-            bombs[i].explode(level, players, 2, bonuses);
+            std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
+            
+            std::cout << "Flame positions: " << flamePositions.size() << std::endl;
+            
+            // Add the flames to the list of flames
+            for (int j = 0; j < flamePositions.size(); ++j) {
+                flames.push_back(
+                    Flame(flamePositions[j].first, flamePositions[j].second)
+                );
+            }
             // add a bomb to the player
             bombs[i].getOwner()->addBomb();
             // Remove the bomb
             bombs.erase(bombs.begin() + i);
+        }
+    }
+
+    // Update the flames
+    for (int i = flames.size() -1; i >= 0; --i) {
+        std::cout << "flame ttl " << flames[i].getTimeLeft() << std::endl;
+        if (flames[i].getTimeLeft() > 0) {
+            flames[i].update();
+        } else {
+            std::cout << "Flame removed " << i << std::endl;
+            flames.erase(flames.begin() + i);
         }
     }
 }
@@ -158,6 +178,11 @@ void Game::render()
     // Draw the bombs
     for (int i = 0; i < bombs.size(); ++i) {
         bombs[i].draw(window);
+    }
+
+    // Draw the flames
+    for (int i = 0; i < flames.size(); ++i) {
+        flames[i].draw(window);
     }
 }
 
