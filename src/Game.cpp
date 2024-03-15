@@ -103,7 +103,6 @@ void Game::processEvents()
             window.close();
         else if (event.type == sf::Event::KeyPressed) {
             // print player strength and number of bombs
-            std::cout << "Strength: " << players[0].getStrength() << " Bombs: " << players[0].getNumBombs() << std::endl;
             if (event.key.code == sf::Keyboard::Up) {
                 if(isLegalMove(players[0].getX(), players[0].getY() - 1)) {
                     players[0].move(0, -1);
@@ -154,7 +153,6 @@ void Game::update()
 
     // Update the bombs
     for (int i = bombs.size() - 1; i >= 0; --i) {
-        std::cout << bombs[i].getTimeLeft() << std::endl;
         if(bombs[i].getTimeLeft() > 0) {
             bombs[i].update();
             bombs[i].changeTexture();
