@@ -7,7 +7,6 @@ Player::Player() {
     y = 0;
     speed = 0;
     type = PLAYER;
-    alive = true;
     strength = DEFAULT_PLAYER_STRENGTH;
     numBombs = DEFAULT_PLAYER_BOMBS;
 }
@@ -17,7 +16,6 @@ Player::Player(int x, int y, int speed, std::string texturePath, PlayerType type
     this->y = y;
     this->speed = speed;
     this->type = type;
-    alive = true;
     strength = DEFAULT_PLAYER_STRENGTH;
     numBombs = DEFAULT_PLAYER_BOMBS;
 
@@ -58,7 +56,7 @@ bool Player::dropBomb() {
 void Player::die() {
     // handle player death
     std::cout << "Player died!" << std::endl;
-    alive = false;
+    
 }
 
 void Player::addBonus(int type) {

@@ -52,29 +52,17 @@ void Game::run()
 {
     while (window.isOpen())
     {
-        if (winner == NO_WINNER) {
-            hasMoved = false;
-            processEvents();
+        hasMoved = false;
+        processEvents();
 
-            window.clear(sf::Color::Black); // Clear the window with black color
+        window.clear(sf::Color::Black); // Clear the window with black color
 
-            render();
-            if (hasMoved) {
-                update();
-            }
-
-            window.display(); // End the current frame and display everything
-        } else {
-            std::cout << "The winner is: ";
-            if (winner == PLAYER1) {
-                std::cout << "Player 1" << std::endl;
-            } else if (winner == PLAYER2) {
-                std::cout << "Player 2" << std::endl;
-            } else {
-                std::cout << "Nobody" << std::endl;
-            }
-            window.close();
+        render();
+        if (hasMoved) {
+            update();
         }
+
+        window.display(); // End the current frame and display everything
     }
 }
 
@@ -166,22 +154,6 @@ void Game::update()
             flames[i].update();
         } else {
             flames.erase(flames.begin() + i);
-        }
-    }
-
-    int numAlive = 0;
-    for (int i = 0; i < 2; ++i) {
-        if (players[i].isAlive()) {
-            numAlive++;
-        }
-    }
-    if (numAlive == 0) {
-        winner = DRAW;
-    } else if (numAlive == 1) {
-        if (players[0].isAlive()) {
-            winner = PLAYER1;
-        } else {
-            winner = PLAYER2;
         }
     }
 }
