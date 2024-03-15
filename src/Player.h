@@ -23,6 +23,7 @@ private:
     sf::Texture texture;
     sf::Sprite sprite;
     PlayerType type;
+    bool alive;
 
     int strength;
     int numBombs;
@@ -43,6 +44,8 @@ public:
     void addBomb() { numBombs++; }
 
     void addBonus(int type);
+
+    bool isAlive() const { return alive; }
 };
 
 #endif // LEVEL_P
