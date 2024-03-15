@@ -124,7 +124,7 @@ void Game::update()
     }
 
     // Update the bombs
-    for (int i = 0; i < bombs.size(); ++i) {
+    for (int i = bombs.size() - 1; i >= 0; --i) {
         std::cout << bombs[i].getTimeLeft() << std::endl;
         if(bombs[i].getTimeLeft() > 0) {
             bombs[i].update();
@@ -150,11 +150,9 @@ void Game::update()
 
     // Update the flames
     for (int i = flames.size() -1; i >= 0; --i) {
-        std::cout << "flame ttl " << flames[i].getTimeLeft() << std::endl;
         if (flames[i].getTimeLeft() > 0) {
             flames[i].update();
         } else {
-            std::cout << "Flame removed " << i << std::endl;
             flames.erase(flames.begin() + i);
         }
     }
