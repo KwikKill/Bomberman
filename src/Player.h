@@ -1,5 +1,5 @@
-#ifndef LEVEL_P
-#define LEVEL_P
+#ifndef PLAYER_P
+#define PLAYER_P
 
 #include <SFML/Graphics.hpp>
 
@@ -13,6 +13,8 @@ enum PlayerType
     PLAYER,
     AI,
 };
+
+class Game;
 
 class Player
 {
@@ -33,7 +35,7 @@ public:
     Player(int x, int y, int speed, std::string texturePath, PlayerType type);
     void draw(sf::RenderWindow &window);
     void move(int dx, int dy);
-    void update();
+    void update(Game &game);
     void die();
     bool dropBomb();
     int getX() const { return x; }
@@ -48,4 +50,4 @@ public:
     bool isAlive() const { return alive; }
 };
 
-#endif // LEVEL_P
+#endif // PLAYER_P

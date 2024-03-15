@@ -152,7 +152,7 @@ void Game::update()
 {
     // Update the players
     for (int i = 0; i < 2; ++i) {
-        players[i].update();
+        players[i].update(*this);
     }
 
     // Update the bombs

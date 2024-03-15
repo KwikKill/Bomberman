@@ -41,7 +41,7 @@ void Player::move(int dx, int dy) {
     y += dy * speed;
 }
 
-void Player::update() {
+void Player::update(Game &game) {
     if (type == AI) {
         // AI logic
     }
