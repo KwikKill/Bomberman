@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Bomb.h"
 #include "Bonus.h"
+#include <optional>
 
 Game::Game() {
     hasMoved = false;
@@ -234,7 +235,7 @@ void Game::render()
     }
 }
 
-bool Game::isLegalMove(int x, int y) {
+bool Game::isLegalMove(int x, int y, std::optional<Player> player) {
     if(level.isEmpty(x, y)) {
         // Check if there is a bomb at the position
         for (long unsigned i = 0; i < bombs.size(); ++i) {
@@ -244,6 +245,9 @@ bool Game::isLegalMove(int x, int y) {
         }
         // Check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
+            if(player.has_value() && player.value().getX() == x && player.value().getY() == y) {
+                continue;
+            }
             if (players[i].getX() == x && players[i].getY() == y) {
                 return false;
             }

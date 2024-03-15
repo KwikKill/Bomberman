@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <optional>
 #include "Level.h"
 #include "Player.h"
 #include "Bomb.h"
@@ -37,8 +38,6 @@ private:
     // Use to keep track of the player movement state
     bool hasMoved;
 
-    bool isLegalMove(int x, int y);
-
     // Array of bombs
     std::vector<Bomb> bombs;
 
@@ -52,10 +51,16 @@ private:
 
     Winner winner;
 
-public:
-    Game();
-    void load(unsigned int level_nb);
-    void run();
+    public:
+        Game();
+        void load(unsigned int level_nb);
+        void run();
+
+        Level &getLevel() { return level; }
+        Player *getPlayers() { return players; }
+        std::vector<Bomb> &getBombs() { return bombs; }
+
+        bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
 };
 
 #endif // GAME_H
