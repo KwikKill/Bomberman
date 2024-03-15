@@ -5,7 +5,9 @@
 #include "Player.h"
 #include "Bomb.h"
 #include "Bonus.h"
+#include "HUD.h"
 #include <optional>
+#include <algorithm>
 
 Game::Game() {
     hasMoved = false;
@@ -17,11 +19,21 @@ void Game::load(unsigned int level_nb) {
     // Create a new level
     level.load(level_nb);
 
+    zoom = 1.0;
+
+    int X_size = level.getWidth() * TILE_SIZE;
+    int Y_size = level.getHeight() * TILE_SIZE;
+    while (X_size > MAX_WINDOW_X * TILE_SIZE || Y_size > MAX_WINDOW_Y * TILE_SIZE) {
+        X_size /= 2;
+        Y_size /= 2;
+        zoom=zoom*2.0;
+    }
+
     // Create a window of the right size
     window.create(
         sf::VideoMode(
-            level.getWidth()*TILE_SIZE,
-            level.getHeight()*TILE_SIZE
+            X_size,
+            Y_size + HUD_HEIGHT
         ),
         "Bomberman",
         sf::Style::Titlebar | sf::Style::Close
@@ -38,14 +50,16 @@ void Game::load(unsigned int level_nb) {
         spawnPositions[randomIndex].second,
         DEFAULT_PLAYER_SPEED,
         "assets/img/player.png",
-        PLAYER
+        PLAYER,
+        zoom
     );
     players[1] = Player(
         spawnPositions[(randomIndex + 1) % spawnPositions.size()].first,
         spawnPositions[(randomIndex + 1) % spawnPositions.size()].second,
         DEFAULT_PLAYER_SPEED,
         "assets/img/ai.png",
-        AI
+        AI,
+        zoom
     );
 }
 
@@ -122,7 +136,8 @@ void Game::processEvents()
                         players[0].getY(),
                         DEFAULT_BOMB_TIMER,
                         players[0].getStrength(),
-                        &players[0]
+                        &players[0],
+                        zoom
                     ));
                 }
             }
@@ -145,12 +160,12 @@ void Game::update()
             bombs[i].changeTexture();
         } else {
             // Explode the bomb
-            std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
+            std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses, zoom);
 
             // Add the flames to the list of flames
             for (long unsigned j = 0; j < flamePositions.size(); ++j) {
                 flames.push_back(
-                    Flame(flamePositions[j].first, flamePositions[j].second)
+                    Flame(flamePositions[j].first, flamePositions[j].second, zoom)
                 );
             }
             // add a bomb to the player
@@ -168,10 +183,10 @@ void Game::update()
             // if the bomb is on a flame, explode it
             for (long unsigned j = 0; j < flames.size(); ++j) {
                 if (bombs[i].getX() == flames[j].getX() && bombs[i].getY() == flames[j].getY()) {
-                    std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
+                    std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses, zoom);
                     for (long unsigned j = 0; j < flamePositions.size(); ++j) {
                         flames.push_back(
-                            Flame(flamePositions[j].first, flamePositions[j].second)
+                            Flame(flamePositions[j].first, flamePositions[j].second, zoom)
                         );
                     }
                     bombs[i].getOwner()->addBomb();
@@ -212,27 +227,30 @@ void Game::update()
 void Game::render()
 {
     // Draw the current game state
-    level.draw(window);
+    level.draw(window, zoom);
     
     // Draw the players
     for (int i = 0; i < 2; ++i) {
-        players[i].draw(window);
+        players[i].draw(window, zoom);
     }
 
     // Draw the bonuses
     for (long unsigned i = 0; i < bonuses.size(); ++i) {
-        bonuses[i].draw(window);
+        bonuses[i].draw(window, zoom);
     }
 
     // Draw the bombs
     for (long unsigned i = 0; i < bombs.size(); ++i) {
-        bombs[i].draw(window);
+        bombs[i].draw(window, zoom);
     }
 
     // Draw the flames
     for (long unsigned i = 0; i < flames.size(); ++i) {
-        flames[i].draw(window);
+        flames[i].draw(window, zoom);
     }
+
+    // Draw the HUD
+    HUD::draw(window, *this);
 }
 
 bool Game::isLegalMove(int x, int y, std::optional<Player> player) {

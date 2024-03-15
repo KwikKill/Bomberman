@@ -11,6 +11,8 @@
 #include "Flame.h"
 
 #define TILE_SIZE 64
+#define MAX_WINDOW_X 30
+#define MAX_WINDOW_Y 10
 
 #define BONUS_SPAWN_CHANCE 15
 
@@ -51,16 +53,18 @@ private:
 
     Winner winner;
 
-    public:
-        Game();
-        void load(unsigned int level_nb);
-        void run();
+    float zoom;
 
-        Level &getLevel() { return level; }
-        Player *getPlayers() { return players; }
-        std::vector<Bomb> &getBombs() { return bombs; }
+public:
+    Game();
+    void load(unsigned int level_nb);
+    void run();
 
-        bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
+    Level &getLevel() { return level; }
+    Player *getPlayers() { return players; }
+    std::vector<Bomb> &getBombs() { return bombs; }
+
+    bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
 };
 
 #endif // GAME_H

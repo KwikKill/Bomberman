@@ -19,3 +19,4 @@ int main(char argc, char** argv)
     std::cout << "Game finished" << std::endl;
     exit(0);
 }
+

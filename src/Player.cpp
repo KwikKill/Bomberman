@@ -13,7 +13,7 @@ Player::Player() {
     numBombs = DEFAULT_PLAYER_BOMBS;
 }
 
-Player::Player(int x, int y, int speed, std::string texturePath, PlayerType type) {
+Player::Player(int x, int y, int speed, std::string texturePath, PlayerType type, int zoom) {
     this->x = x;
     this->y = y;
     this->speed = speed;
@@ -26,13 +26,14 @@ Player::Player(int x, int y, int speed, std::string texturePath, PlayerType type
         // handle error
     }
     sprite.setTexture(texture);
+    sprite.setScale(1.0/zoom, 1.0/zoom);
 }
 
-void Player::draw(sf::RenderWindow &window) {
+void Player::draw(sf::RenderWindow &window, int zoom) {
     sprite.setTexture(texture);
     sprite.setPosition(
-        x * TILE_SIZE,
-        y * TILE_SIZE
+        (x * TILE_SIZE)/zoom,
+        (y * TILE_SIZE)/zoom
     );
     window.draw(sprite);
 }

@@ -32,8 +32,8 @@ private:
 
 public:
     Player();
-    Player(int x, int y, int speed, std::string texturePath, PlayerType type);
-    void draw(sf::RenderWindow &window);
+    Player(int x, int y, int speed, std::string texturePath, PlayerType type, int zoom);
+    void draw(sf::RenderWindow &window, int zoom);
     void move(int dx, int dy);
 
     void update(Game &game);

@@ -16,11 +16,11 @@ void Level::load(unsigned int levelNumber) {
         width = 0;
         height = 0;
 
-        while (std::getline(file, line) && row < MAX_SIZE) {
+        while (std::getline(file, line)) {
             if (line.size() > width) {
                 width = line.size();
             }
-            levelData[row] = line;
+            levelData.push_back(line);
             row++;
         }
         height = row;
@@ -38,12 +38,13 @@ void Level::load(unsigned int levelNumber) {
     }
 }
 
-void Level::draw(sf::RenderWindow &window) {
+void Level::draw(sf::RenderWindow &window, int zoom) {
     sf::Texture wall1texture;
     if (!wall1texture.loadFromFile("assets/img/wall1.png")) {
         // handle error
     }
     sf::Sprite wall1sprite;
+    wall1sprite.scale(1.0/zoom, 1.0/zoom);
     wall1sprite.setTexture(wall1texture);
 
     sf::Texture wall2texture;
@@ -51,6 +52,7 @@ void Level::draw(sf::RenderWindow &window) {
         // handle error
     }
     sf::Sprite wall2sprite;
+    wall2sprite.scale(1.0/zoom, 1.0/zoom);
     wall2sprite.setTexture(wall2texture);
 
     sf::Texture Voidtexture;
@@ -58,26 +60,27 @@ void Level::draw(sf::RenderWindow &window) {
         // handle error
     }
     sf::Sprite voidsprite;
+    voidsprite.scale(1.0/zoom, 1.0/zoom);
     voidsprite.setTexture(Voidtexture);
 
-    for (long unsigned i = 0; i < MAX_SIZE; ++i) {
+    for (long unsigned i = 0; i < levelData.size(); ++i) {
         for (long unsigned j = 0; j < levelData[i].size(); ++j) {
             if (levelData[i][j] == 'X') {
                 wall1sprite.setPosition(
-                    j * wall1texture.getSize().x,
-                    i * wall1texture.getSize().y
+                    j * wall1texture.getSize().x/zoom,
+                    i * wall1texture.getSize().y/zoom
                 );
                 window.draw(wall1sprite);
             } else if (levelData[i][j] == '.') {
                 wall2sprite.setPosition(
-                    j * wall2texture.getSize().x,
-                    i * wall2texture.getSize().y
+                    j * wall2texture.getSize().x/zoom,
+                    i * wall2texture.getSize().y/zoom
                 );
                 window.draw(wall2sprite);
             } else {
                 voidsprite.setPosition(
-                    j * Voidtexture.getSize().x,
-                    i * Voidtexture.getSize().y
+                    j * Voidtexture.getSize().x/zoom,
+                    i * Voidtexture.getSize().y/zoom
                 );
                 window.draw(voidsprite);
             }

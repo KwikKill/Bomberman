@@ -17,8 +17,8 @@ private:
 
 public:
     Flame();
-    Flame(int x, int y);
-    void draw(sf::RenderWindow &window);
+    Flame(int x, int y, int zoom);
+    void draw(sf::RenderWindow &window, int zoom);
     void update();
     int getX() const { return x; }
     int getY() const { return y; }

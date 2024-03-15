@@ -7,7 +7,7 @@ Bonus::Bonus() {
     type = STRENGTH;
 }
 
-Bonus::Bonus(int x, int y, BonusType type) {
+Bonus::Bonus(int x, int y, BonusType type, int zoom) {
     this->x = x;
     this->y = y;
     this->type = type;
@@ -15,14 +15,15 @@ Bonus::Bonus(int x, int y, BonusType type) {
     if (!texture.loadFromFile("assets/img/bonus/" + std::to_string(type) + ".png")) {
         // handle error
     }
+    sprite.scale(1.0/zoom, 1.0/zoom);
     sprite.setTexture(texture);
 }
 
-void Bonus::draw(sf::RenderWindow &window) {
+void Bonus::draw(sf::RenderWindow &window, int zoom) {
     sprite.setTexture(texture);
     sprite.setPosition(
-        x * TILE_SIZE,
-        y * TILE_SIZE
+        (x * TILE_SIZE)/zoom,
+        (y * TILE_SIZE)/zoom
     );
     window.draw(sprite);
 }

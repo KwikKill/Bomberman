@@ -4,12 +4,11 @@
 #define LEVEL_H
 
 #include <string>
-
-#define MAX_SIZE 100
+#include <vector>
 
 class Level {
 private:
-    std::string levelData[MAX_SIZE];
+    std::vector<std::string> levelData;
     size_t width;
     size_t height;
 
@@ -17,7 +16,7 @@ private:
 
 public:
     void load(unsigned int levelNumber);
-    void draw(sf::RenderWindow &window);
+    void draw(sf::RenderWindow &window, int zoom);
 
     bool isEmpty(int x, int y);
     bool isDestroyable(int x, int y);
