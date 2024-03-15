@@ -105,7 +105,6 @@ void Game::processEvents()
                         players[0].getY(),
                         DEFAULT_BOMB_TIMER,
                         players[0].getStrength(),
-                        "assets/img/bomb1.png",
                         &players[0]
                     );
                     numBombs++;
@@ -127,6 +126,7 @@ void Game::update()
         std::cout << bombs[i].getTimeLeft() << std::endl;
         if(bombs[i].getTimeLeft() > 0) {
             bombs[i].update();
+            bombs[i].changeTexture();
         } else {
             // Explode the bomb
             bombs[i].explode(level, players, 2, bonuses, &numBonuses);
