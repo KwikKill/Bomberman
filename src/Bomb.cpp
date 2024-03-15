@@ -70,6 +70,9 @@ void Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bo
                         players[k].die();
                     }
                 }
+                if (level.isundestroyWall(new_x, new_y)) {
+                    break;
+                }
             }
         }
     }

@@ -113,6 +113,10 @@ bool Level::isDestroyable(int x, int y) {
     return false;
 }
 
+bool Level::isundestroyWall(int x, int y) {
+    return levelData[y][x] == 'X';
+}
+
 void Level::destroyWall(int x, int y) {
     levelData[y][x] = ' ';
 }

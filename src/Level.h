@@ -21,6 +21,7 @@ public:
 
     bool isEmpty(int x, int y);
     bool isDestroyable(int x, int y);
+    bool isundestroyWall(int x, int y);
     void destroyWall(int x, int y);
 
     size_t getWidth() const { return width; }
