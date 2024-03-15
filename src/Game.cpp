@@ -55,17 +55,9 @@ void Game::run()
         if (winner == NO_WINNER) {
             hasMoved = false;
             processEvents();
-        if (winner == NO_WINNER) {
-            hasMoved = false;
-            processEvents();
 
             window.clear(sf::Color::Black); // Clear the window with black color
-            window.clear(sf::Color::Black); // Clear the window with black color
 
-            render();
-            if (hasMoved) {
-                update();
-            }
             render();
             if (hasMoved) {
                 update();
@@ -84,17 +76,6 @@ void Game::run()
             window.close();
         }
             window.display(); // End the current frame and display everything
-        } else {
-            std::cout << "The winner is: ";
-            if (winner == PLAYER1) {
-                std::cout << "Player 1" << std::endl;
-            } else if (winner == PLAYER2) {
-                std::cout << "Player 2" << std::endl;
-            } else {
-                std::cout << "Nobody" << std::endl;
-            }
-            window.close();
-        }
     }
 }
 
