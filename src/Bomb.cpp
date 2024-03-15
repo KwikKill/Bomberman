@@ -2,6 +2,12 @@
 #include "Game.h"
 #include "Bonus.h"
 
+std::vector<std::string> *Bomb::bombTextures = new std::vector<std::string> {
+    "assets/img/bomb1.png",
+    "assets/img/bomb2.png",
+    "assets/img/bomb3.png",
+};
+
 Bomb::Bomb() {
     x = 0;
     y = 0;
@@ -9,12 +15,19 @@ Bomb::Bomb() {
     strength = 1;
 }
 
-Bomb::Bomb(int x, int y, int timer, int strength, std::string texturePath, Player *owner) {
+Bomb::Bomb(int x, int y, int timer, int strength, Player *owner) {
     this->x = x;
     this->y = y;
     time_left = timer;
     this->strength = strength;
     this->owner = owner;
+
+    std::cout << "Time left : " << time_left << std::endl;
+    std::cout << "Size : " << bombTextures->size() << std::endl;
+    if (time_left > bombTextures->size() - 1) {
+        time_left = bombTextures->size() - 1;
+    }
+    std::string texturePath = bombTextures->at(time_left);
 
     if (!texture.loadFromFile(texturePath)) {
         // handle error
@@ -78,4 +91,16 @@ void Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bo
     }
 
     
+}
+
+void Bomb::changeTexture() {
+    if (time_left > bombTextures->size() - 1) {
+        if (!texture.loadFromFile(bombTextures->at(bombTextures->size() - 1))) {
+            // handle error
+        }
+    } else {
+        if (!texture.loadFromFile(bombTextures->at(time_left))) {
+            // handle error
+        }        
+    }
 }

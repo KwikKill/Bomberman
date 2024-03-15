@@ -20,9 +20,11 @@ private:
 
     Player *owner;
 
+    static std::vector<std::string> *bombTextures;
+
 public:
     Bomb();
-    Bomb(int x, int y, int timer, int strength, std::string texturePath, Player *owner);
+    Bomb(int x, int y, int timer, int strength, Player *owner);
     void draw(sf::RenderWindow &window);
     void explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses);
     void update();
@@ -31,6 +33,8 @@ public:
     int getTimeLeft() const { return time_left; }
     int getStrength() const { return strength; }
     Player *getOwner() const { return owner; }
+
+    void changeTexture();
 };
 
 #endif // BOMB_H
