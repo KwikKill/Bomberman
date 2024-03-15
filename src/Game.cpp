@@ -144,9 +144,7 @@ void Game::update()
         } else {
             // Explode the bomb
             std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
-            
-            std::cout << "Flame positions: " << flamePositions.size() << std::endl;
-            
+
             // Add the flames to the list of flames
             for (int j = 0; j < flamePositions.size(); ++j) {
                 flames.push_back(
@@ -157,6 +155,29 @@ void Game::update()
             bombs[i].getOwner()->addBomb();
             // Remove the bomb
             bombs.erase(bombs.begin() + i);
+        }
+    }
+    
+    // Recursively explode the bombs
+    bool explosion = true;
+    while (explosion) {
+        explosion = false;
+        for (int i = bombs.size() - 1; i >= 0; --i) {
+            // if the bomb is on a flame, explode it
+            for (int j = 0; j < flames.size(); ++j) {
+                if (bombs[i].getX() == flames[j].getX() && bombs[i].getY() == flames[j].getY()) {
+                    std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
+                    for (int j = 0; j < flamePositions.size(); ++j) {
+                        flames.push_back(
+                            Flame(flamePositions[j].first, flamePositions[j].second)
+                        );
+                    }
+                    bombs[i].getOwner()->addBomb();
+                    bombs.erase(bombs.begin() + i);
+                    explosion = true;
+                    break;
+                }
+            }
         }
     }
 
