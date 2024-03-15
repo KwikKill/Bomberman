@@ -241,6 +241,12 @@ bool Game::isLegalMove(int x, int y) {
                 return false;
             }
         }
+        // Check if there is a player at the position
+        for (int i = 0; i < 2; ++i) {
+            if (players[i].getX() == x && players[i].getY() == y) {
+                return false;
+            }
+        }
         return true;
     }
     return false;
