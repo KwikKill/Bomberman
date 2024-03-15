@@ -41,6 +41,8 @@ public:
     int getStrength() const { return strength; }
     int getNumBombs() const { return numBombs; }
     void addBomb() { numBombs++; }
+
+    void addBonus(int type);
 };
 
 #endif // LEVEL_P

@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Player.h"
 #include "Bomb.h"
+#include "Bonus.h"
 
 void Game::load() {
     // Create a new level
@@ -41,6 +42,7 @@ void Game::load() {
     );
 
     numBombs = 0;
+    numBonuses = 0;
 }
 
 void Game::run()
@@ -69,24 +71,30 @@ void Game::processEvents()
         if (event.type == sf::Event::Closed)
             window.close();
         else if (event.type == sf::Event::KeyPressed) {
+            // print player strength and number of bombs
+            std::cout << "Strength: " << players[0].getStrength() << " Bombs: " << players[0].getNumBombs() << std::endl;
             if (event.key.code == sf::Keyboard::Up) {
                 if(isLegalMove(players[0].getX(), players[0].getY() - 1)) {
                     players[0].move(0, -1);
+                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Down) {
                 if(isLegalMove(players[0].getX(), players[0].getY() + 1)) {
                     players[0].move(0, 1);
+                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Left) {
                 if(isLegalMove(players[0].getX() - 1, players[0].getY())) {
                     players[0].move(-1, 0);
+                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Right) {
                 if(isLegalMove(players[0].getX() + 1, players[0].getY())) {
                     players[0].move(1, 0);
+                    PlayerCheckBonus(players[0]);
                 }
                 hasMoved = true;
             } else if (event.key.code == sf::Keyboard::Space) {
@@ -121,7 +129,7 @@ void Game::update()
             bombs[i].update();
         } else {
             // Explode the bomb
-            bombs[i].explode(level, players, 2);
+            bombs[i].explode(level, players, 2, bonuses, &numBonuses);
             // add a bomb to the player
             bombs[i].getOwner()->addBomb();
             // Remove the bomb
@@ -143,6 +151,11 @@ void Game::render()
         players[i].draw(window);
     }
 
+    // Draw the bonuses
+    for (int i = 0; i < numBonuses; ++i) {
+        bonuses[i].draw(window);
+    }
+
     // Draw the bombs
     for (int i = 0; i < numBombs; ++i) {
         bombs[i].draw(window);
@@ -160,4 +173,16 @@ bool Game::isLegalMove(int x, int y) {
         return true;
     }
     return false;
+}
+
+void Game::PlayerCheckBonus(Player &player) {
+    for (int i = 0; i < numBonuses; ++i) {
+        if (player.getX() == bonuses[i].getX() && player.getY() == bonuses[i].getY()) {
+            player.addBonus(bonuses[i].getType());
+            for (int j = i; j < numBonuses - 1; ++j) {
+                bonuses[j] = bonuses[j + 1];
+            }
+            numBonuses--;
+        }
+    }
 }

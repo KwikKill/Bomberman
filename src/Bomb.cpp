@@ -1,5 +1,6 @@
 #include "Bomb.h"
 #include "Game.h"
+#include "Bonus.h"
 
 Bomb::Bomb() {
     x = 0;
@@ -34,7 +35,7 @@ void Bomb::update() {
     time_left--;
 }
 
-void Bomb::explode(Level &level, Player *players, int numPlayers) {
+void Bomb::explode(Level &level, Player *players, int numPlayers, Bonus *bonuses, int *numBonuses) {
     // explode in all 4 directions
     for (int i = 0; i < 4; ++i) {
         for (int j = 1; j <= strength; ++j) {
@@ -53,16 +54,21 @@ void Bomb::explode(Level &level, Player *players, int numPlayers) {
             int new_x = x + dx;
             int new_y = y + dy;
 
-            for (int k = 0; k < numPlayers; ++k) {
-                if (players[k].getX() == new_x && players[k].getY() == new_y) {
-                    players[k].die();
-                }
-            }
-
             if (level.isDestroyable(new_x, new_y)) {
                 level.destroyWall(new_x, new_y);
-            } else {
+                if (rand() % 100 < 20) {
+                    std::cout << "Bonus " << new_x << " " << new_y << std::endl;
+                    bonuses[*numBonuses] = Bonus(new_x, new_y, Bonus::getRandomType());
+                    (*numBonuses)++;
+                    std::cout << "Bonus : " << numBonuses << std::endl;
+                }
                 break;
+            } else {
+                for (int k = 0; k < numPlayers; ++k) {
+                    if (players[k].getX() == new_x && players[k].getY() == new_y) {
+                        players[k].die();
+                    }
+                }
             }
         }
     }

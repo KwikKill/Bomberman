@@ -57,3 +57,11 @@ void Player::die() {
     // handle player death
     std::cout << "Player died!" << std::endl;
 }
+
+void Player::addBonus(int type) {
+    if (type == STRENGTH) {
+        strength++;
+    } else if (type == NUMBOMB) {
+        numBombs++;
+    }
+}

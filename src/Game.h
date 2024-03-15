@@ -6,9 +6,11 @@
 #include "Level.h"
 #include "Player.h"
 #include "Bomb.h"
+#include "Bonus.h"
 
 #define TILE_SIZE 64
 #define MAX_BOMBS 100
+#define MAX_BONUSES 100
 
 class Game
 {
@@ -26,11 +28,17 @@ private:
     // Use to keep track of the player movement state
     bool hasMoved;
 
+    bool isLegalMove(int x, int y);
+
     // Array of bombs
     Bomb bombs[MAX_BOMBS];
     int numBombs;
 
-    bool isLegalMove(int x, int y);
+    // Array of bonuses
+    Bonus bonuses[MAX_BONUSES];
+    int numBonuses;
+
+    void PlayerCheckBonus(Player &player);
 
 public:
     void load();

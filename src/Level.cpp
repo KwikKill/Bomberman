@@ -1,6 +1,7 @@
 #include <string>
 #include <fstream>
 #include "Level.h"
+#include "Game.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -110,4 +111,8 @@ bool Level::isDestroyable(int x, int y) {
         return true;
     }
     return false;
+}
+
+void Level::destroyWall(int x, int y) {
+    levelData[y][x] = ' ';
 }
