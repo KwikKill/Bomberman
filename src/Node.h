@@ -3,9 +3,6 @@
 #ifndef NODE_H
 #define NODE_H
 
-#define NUM_SIMULATIONS 1000
-#define MAX_TURNS 100
-
 class Node {
 public:
     GameState state;

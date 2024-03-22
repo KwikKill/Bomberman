@@ -77,7 +77,6 @@ void Game::run()
             render();
             if (gameState.AIturn) {
                 update();
-                gameState.turns++;
             }
 
             window.display(); // End the current frame and display everything
@@ -127,6 +126,11 @@ void Game::processEvents()
 
 void Game::update()
 {
+    // Update the players
+    for (int i = 0; i < 2; ++i) {
+        gameState.players[i].update(gameState);
+    }
+
     // Update the game state
     gameState.update();
 }

@@ -12,12 +12,13 @@ void GameState::PlayerCheckBonus(Player &player) {
 
 void GameState::update()
 {
+    std::cout << "Turn " << turns << std::endl;
+
     // Update the players
     for (int i = 0; i < 2; ++i) {
-        players[i].update(*this);
-        PlayerCheckBonus(players[i]);   
+        PlayerCheckBonus(players[i]);
     }
-
+    
     // Update the bombs
     for (int i = bombs.size() - 1; i >= 0; --i) {
         std::cout << "bomb " << i << " time left: " << bombs[i].getTimeLeft() << std::endl;
@@ -88,4 +89,7 @@ void GameState::update()
             winner = PLAYER2;
         }
     }
+
+    turns++;
+    AIturn = false;
 }

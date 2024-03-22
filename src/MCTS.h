@@ -4,6 +4,9 @@
 #include "Player.h"
 #include "GameState.h"
 
+#define NUM_SIMULATIONS 1000
+#define MAX_TURNS 1000
+
 class MCTS {
 public:
     Action findBestAction(GameState currentState);

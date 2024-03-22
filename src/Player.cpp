@@ -100,7 +100,9 @@ void Player::update(GameState &gamestate) {
             }
         }*/
         MCTS mtcs = MCTS();
+        std::cout << "Finding best action..." << std::endl;
         Action action = mtcs.findBestAction(gamestate);
+        std::cout << "Action: " << action << std::endl;
         play(action, gamestate);
     }
 }
