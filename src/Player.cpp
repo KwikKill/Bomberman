@@ -3,6 +3,8 @@
 #include "Game.h"
 //#include "PathFinding.h"
 #include "GameState.h"
+#include "Node.h"
+#include "MCTS.h"
 
 Player::Player() {
     x = 0;
@@ -85,7 +87,7 @@ void Player::play(Action action, GameState &state) {
 
 }
 
-void Player::update(Game &game) {
+void Player::update(GameState &gamestate) {
     if (type == AI) {
         /*if(!PathFinding::isSafe(x, y, game, *this)) {
             std::vector<std::pair<int, int>> path = PathFinding::findNearestSafePath(x, y, game, *this);
@@ -97,6 +99,9 @@ void Player::update(Game &game) {
                 move(nextMove.first-x, nextMove.second-y);
             }
         }*/
+        MCTS mtcs = MCTS();
+        Action action = mtcs.findBestAction(gamestate);
+        play(action, gamestate);
     }
 }
 

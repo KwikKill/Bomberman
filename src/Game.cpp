@@ -129,7 +129,7 @@ void Game::update()
 {
     // Update the players
     for (int i = 0; i < 2; ++i) {
-        gameState.players[i].update(*this);
+        gameState.players[i].update(gameState);
         gameState.PlayerCheckBonus(gameState.players[i]);   
     }
 

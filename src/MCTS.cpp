@@ -1,17 +1,41 @@
 #include "GameState.h"
 #include "Node.h"
+#include "MCTS.h"
 #include "Bomb.h"
+#include <cmath>
+#include <iostream>
 
 Node* bestChild(Node* node) {
     // Return the child node with the highest value
+
+    double bestValue = -1;
+
+    Node* bestChild = nullptr;
+
+    for (Node* child : node->children) {
+        double value = (double)child->wins / child->visits + sqrt(2 * log(node->visits) / child->visits);
+
+        if (value > bestValue) {
+            bestValue = value;
+            bestChild = child;
+        }
+    }
+
+    return bestChild;
 }
 
-int defaultPolicy(GameState state) {
-    // Simulate a random game and return the result
-}
 
 void backpropagate(Node* node, int result) {
     // Update the node's statistics based on the result of the game
+
+    node->visits++;
+    node->wins += result;
+
+    if (node->parent != nullptr) {
+        backpropagate(node->parent, result);
+    }
+
+    return;
 }
 
 bool isTerminal(GameState state) {
@@ -140,6 +164,28 @@ GameState getNewState(const GameState& state, Action action) {
     GameState newState = state;
 
     newState.players[1].play(action, newState);
+
+    return newState;
+}
+
+int defaultPolicy(GameState state) {
+    // Simulate a random game and return the result
+
+    while (!isTerminal(state)) {
+        std::vector<Action> possibleActions = getPossibleActions(state);
+
+        Action action = possibleActions[rand() % possibleActions.size()];
+
+        state = getNewState(state, action);
+    }
+
+    if (state.winner == NO_WINNER) {
+        return 0;
+    } else if (state.winner == PLAYER1) {
+        return 1;
+    } else {
+        return -1;
+    }
 }
 
 Node* expand(Node* node) {
@@ -177,10 +223,11 @@ Node* treePolicy(Node* node) {
     return node;
 }
 
-Action MCTS(GameState currentState) {
+Action MCTS::findBestAction(GameState currentState) {
     Node* root = new Node(currentState, NO_ACTION, nullptr);
 
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
+        std::cout << "Simulation " << i << std::endl;
         Node* node = treePolicy(root);
         int result = defaultPolicy(node->state);
         backpropagate(node, result);

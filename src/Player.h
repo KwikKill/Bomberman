@@ -48,7 +48,7 @@ public:
     void draw(sf::RenderWindow &window, int zoom);
     void play(Action action, GameState &state);
 
-    void update(Game &game);
+    void update(GameState &gamestate);
 
     void die();
     bool dropBomb();
