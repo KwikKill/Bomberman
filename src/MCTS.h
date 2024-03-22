@@ -9,7 +9,7 @@
 
 class MCTS {
 public:
-    Action findBestAction(GameState currentState);
+    static Action findBestAction(GameState currentState);
 };
 
 #endif // MCST_H

@@ -18,7 +18,7 @@ private:
     sf::Texture texture;
     sf::Sprite sprite;
 
-    Player *owner;
+    Player *owner{};
 
     static std::vector<std::string> *bombTextures;
 

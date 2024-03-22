@@ -4,6 +4,7 @@
 #include "Bomb.h"
 #include <cmath>
 #include <iostream>
+#include <utility>
 
 Node* bestChild(Node* node) {
     // Return the child node with the highest value
@@ -35,10 +36,9 @@ void backpropagate(Node* node, int result) {
         backpropagate(node->parent, result);
     }
 
-    return;
 }
 
-bool isTerminal(GameState state) {
+bool isTerminal(const GameState& state) {
     // Check if the game is over
     if(state.winner != NO_WINNER) {
         return true;
@@ -70,8 +70,8 @@ std::vector<Action> getPossibleActions(GameState& state) {
             }
         }
         // check if there is a player at the position
-        for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[playerId].getX() && state.players[i].getY() == state.players[playerId].getY() - 1) {
+        for (const auto & player : state.players) {
+            if (player.getX() == state.players[playerId].getX() && player.getY() == state.players[playerId].getY() - 1) {
                 canPlay = false;
                 break;
             }
@@ -92,8 +92,8 @@ std::vector<Action> getPossibleActions(GameState& state) {
             }
         }
         // check if there is a player at the position
-        for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[playerId].getX() && state.players[i].getY() == state.players[playerId].getY() + 1) {
+        for (const auto & player : state.players) {
+            if (player.getX() == state.players[playerId].getX() && player.getY() == state.players[playerId].getY() + 1) {
                 canPlay = false;
                 break;
             }
@@ -114,8 +114,8 @@ std::vector<Action> getPossibleActions(GameState& state) {
             }
         }
         // check if there is a player at the position
-        for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[playerId].getX() - 1 && state.players[i].getY() == state.players[playerId].getY()) {
+        for (const auto & player : state.players) {
+            if (player.getX() == state.players[playerId].getX() - 1 && player.getY() == state.players[playerId].getY()) {
                 canPlay = false;
                 break;
             }
@@ -136,8 +136,8 @@ std::vector<Action> getPossibleActions(GameState& state) {
             }
         }
         // check if there is a player at the position
-        for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[playerId].getX() + 1 && state.players[i].getY() == state.players[playerId].getY()) {
+        for (const auto & player : state.players) {
+            if (player.getX() == state.players[playerId].getX() + 1 && player.getY() == state.players[playerId].getY()) {
                 canPlay = false;
                 break;
             }
@@ -227,7 +227,7 @@ Node* treePolicy(Node* node) {
 }
 
 Action MCTS::findBestAction(GameState currentState) {
-    Node* root = new Node(currentState, NO_ACTION, nullptr);
+    Node* root = new Node(std::move(currentState), NO_ACTION, nullptr);
 
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
         //std::cout << "Simulation " << i << std::endl;

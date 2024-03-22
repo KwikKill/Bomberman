@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++17 -O3 -Wall -Iinclude -I ${PATH_TO_FFML}/include
+CXXFLAGS = -std=c++17 -O3 -Wall -Werror -pedantic-errors -Iinclude -I ${PATH_TO_FFML}/include
 
 # Linker flags
 LDFLAGS = -L ${PATH_TO_FFML}/lib

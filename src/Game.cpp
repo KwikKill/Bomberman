@@ -14,6 +14,7 @@ Game::Game() {
     gameState.winner = NO_WINNER;
     gameState.level = Level();
     gameState.turns = 0;
+    zoom = 1.0;
 }
 
 void Game::load(unsigned int level_nb) {

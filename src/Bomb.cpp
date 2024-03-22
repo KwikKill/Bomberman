@@ -54,7 +54,7 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
     std::vector<std::pair<int, int>> flamePositions;
 
     // Add flame position for the bomb itself
-    flamePositions.push_back(std::make_pair(x, y));
+    flamePositions.emplace_back(x, y);
 
     // Check if the bomb is in the same position as a player
     for (int i = 0; i < numPlayers; ++i) {
@@ -85,12 +85,11 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
                 level.destroyWall(new_x, new_y);
                 if (rand() % 100 < BONUS_SPAWN_CHANCE) {
                     std::cout << "Bonus " << new_x << " " << new_y << std::endl;
-                    bonuses.push_back(
-                        Bonus(new_x, new_y, Bonus::getRandomType())
-                    );
+
+                    bonuses.emplace_back(new_x, new_y, Bonus::getRandomType());
                     std::cout << "Bonus : " << bonuses.size() << std::endl;
                 }
-                flamePositions.push_back(std::make_pair(new_x, new_y));
+                flamePositions.emplace_back(new_x, new_y);
                 break;
             } else {
                 for (int k = 0; k < numPlayers; ++k) {
@@ -101,7 +100,7 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
                 if (level.isundestroyWall(new_x, new_y)) {
                     break;
                 }
-                flamePositions.push_back(std::make_pair(new_x, new_y));
+                flamePositions.emplace_back(new_x, new_y);
             }
         }
     }
