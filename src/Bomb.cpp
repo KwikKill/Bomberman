@@ -50,7 +50,7 @@ void Bomb::update() {
     time_left--;
 }
 
-std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses, int zoom) {
+std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses) {
     std::vector<std::pair<int, int>> flamePositions;
 
     // Add flame position for the bomb itself
@@ -86,7 +86,7 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
                 if (rand() % 100 < BONUS_SPAWN_CHANCE) {
                     std::cout << "Bonus " << new_x << " " << new_y << std::endl;
                     bonuses.push_back(
-                        Bonus(new_x, new_y, Bonus::getRandomType(), zoom)
+                        Bonus(new_x, new_y, Bonus::getRandomType())
                     );
                     std::cout << "Bonus : " << bonuses.size() << std::endl;
                 }

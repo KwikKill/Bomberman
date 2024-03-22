@@ -127,82 +127,8 @@ void Game::processEvents()
 
 void Game::update()
 {
-    // Update the players
-    for (int i = 0; i < 2; ++i) {
-        gameState.players[i].update(gameState);
-        gameState.PlayerCheckBonus(gameState.players[i]);   
-    }
-
-    // Update the bombs
-    for (int i = gameState.bombs.size() - 1; i >= 0; --i) {
-        std::cout << "bomb " << i << " time left: " << gameState.bombs[i].getTimeLeft() << std::endl;
-        if(gameState.bombs[i].getTimeLeft() > 0) {
-            gameState.bombs[i].update();
-            gameState.bombs[i].changeTexture();
-        } else {
-            // Explode the bomb
-            std::vector<std::pair<int, int>> flamePositions = gameState.bombs[i].explode(gameState.level, gameState.players, 2, gameState.bonuses, zoom);
-
-            // Add the flames to the list of flames
-            for (long unsigned j = 0; j < flamePositions.size(); ++j) {
-                gameState.flames.push_back(
-                    Flame(flamePositions[j].first, flamePositions[j].second, zoom)
-                );
-            }
-            // add a bomb to the player
-            gameState.bombs[i].getOwner()->addBomb();
-            // Remove the bomb
-            gameState.bombs.erase(gameState.bombs.begin() + i);
-        }
-    }
-    
-    // Recursively explode the bombs
-    bool explosion = true;
-    while (explosion) {
-        explosion = false;
-        for (int i = gameState.bombs.size() - 1; i >= 0; --i) {
-            // if the bomb is on a flame, explode it
-            for (long unsigned j = 0; j < gameState.flames.size(); ++j) {
-                if (gameState.bombs[i].getX() == gameState.flames[j].getX() && gameState.bombs[i].getY() == gameState.flames[j].getY()) {
-                    std::vector<std::pair<int, int>> flamePositions = gameState.bombs[i].explode(gameState.level, gameState.players, 2, gameState.bonuses, zoom);
-                    for (long unsigned j = 0; j < flamePositions.size(); ++j) {
-                        gameState.flames.push_back(
-                            Flame(flamePositions[j].first, flamePositions[j].second, zoom)
-                        );
-                    }
-                    gameState.bombs[i].getOwner()->addBomb();
-                    gameState.bombs.erase(gameState.bombs.begin() + i);
-                    explosion = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // Update the flames
-    for (int i = gameState.flames.size() -1; i >= 0; --i) {
-        if (gameState.flames[i].getTimeLeft() > 0) {
-            gameState.flames[i].update();
-        } else {
-            gameState.flames.erase(gameState.flames.begin() + i);
-        }
-    }
-
-    int numAlive = 0;
-    for (int i = 0; i < 2; ++i) {
-        if (gameState.players[i].isAlive()) {
-            numAlive++;
-        }
-    }
-    if (numAlive == 0) {
-        gameState.winner = DRAW;
-    } else if (numAlive == 1) {
-        if (gameState.players[0].isAlive()) {
-            gameState.winner = PLAYER1;
-        } else {
-            gameState.winner = PLAYER2;
-        }
-    }
+    // Update the game state
+    gameState.update();
 }
 
 void Game::render()

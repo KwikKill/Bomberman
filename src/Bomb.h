@@ -27,7 +27,7 @@ public:
     Bomb(int x, int y, int timer, int strength, Player *owner);
     void draw(sf::RenderWindow &window, int zoom);
     // return a vector of all the positions that require a flame
-    std::vector<std::pair<int, int>> explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses, int zoom);
+    std::vector<std::pair<int, int>> explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses);
     void update();
     int getX() const { return x; }
     int getY() const { return y; }

@@ -29,6 +29,7 @@ public:
     int turns;
 
     void PlayerCheckBonus(Player &player);
+    void update();
 };
 
 #endif // GAMESTATE_H

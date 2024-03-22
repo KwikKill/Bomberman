@@ -22,7 +22,7 @@ private:
 
 public:
     Bonus();
-    Bonus(int x, int y, BonusType type, int zoom);
+    Bonus(int x, int y, BonusType type);
     void draw(sf::RenderWindow &window, int zoom);
     void update();
     int getX() const { return x; }
