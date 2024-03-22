@@ -4,25 +4,13 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <optional>
-#include "Level.h"
-#include "Player.h"
-#include "Bomb.h"
-#include "Bonus.h"
-#include "Flame.h"
+#include "GameState.h"
 
 #define TILE_SIZE 64
 #define MAX_WINDOW_X 30
 #define MAX_WINDOW_Y 10
 
 #define BONUS_SPAWN_CHANCE 15
-
-enum Winner
-{
-    PLAYER1,
-    PLAYER2,
-    DRAW,
-    NO_WINNER
-};
 
 class Game
 {
@@ -32,24 +20,9 @@ private:
     void render();
 
     sf::RenderWindow window; 
-    Level level;
 
-    // Array of players
-    Player players[2];
-
-    // Use to keep track of the player movement state
-    bool hasMoved;
-
-    // Array of bombs
-    std::vector<Bomb> bombs;
-
-    // Array of bonuses
-    std::vector<Bonus> bonuses;
-
-    // Array of flames
-    std::vector<Flame> flames;
-
-    Winner winner;
+    // GameState
+    GameState gameState;
 
     float zoom;
 
@@ -58,9 +31,9 @@ public:
     void load(unsigned int level_nb);
     void run();
 
-    Level &getLevel() { return level; }
-    Player *getPlayers() { return players; }
-    std::vector<Bomb> &getBombs() { return bombs; }
+    Level &getLevel() { return gameState.level; }
+    Player *getPlayers() { return gameState.players; }
+    std::vector<Bomb> &getBombs() { return gameState.bombs; }
 
     bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
 

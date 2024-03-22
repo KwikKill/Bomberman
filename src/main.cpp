@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Game.h"
 
-int main(char argc, char** argv)
+int main(int argc, char** argv)
 {
     srand(time(NULL));
     // Print a message to the console
