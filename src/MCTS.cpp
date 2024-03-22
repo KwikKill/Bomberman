@@ -60,19 +60,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
 
     // Check if the player can move up
     if (state.level.isEmpty(state.players[playerId].getX(), state.players[playerId].getY() - 1)) {
-        bool canPlay = false;
+        bool canPlay = true;
 
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
             if (state.bombs[i].getX() == state.players[playerId].getX() && state.bombs[i].getY() == state.players[playerId].getY() - 1) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
             if (state.players[i].getX() == state.players[playerId].getX() && state.players[i].getY() == state.players[playerId].getY() - 1) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
@@ -82,19 +82,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
     }
     // Check if the player can move down
     if (state.level.isEmpty(state.players[playerId].getX(), state.players[playerId].getY() + 1)) {
-        bool canPlay = false;
+        bool canPlay = true;
         
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
             if (state.bombs[i].getX() == state.players[playerId].getX() && state.bombs[i].getY() == state.players[playerId].getY() + 1) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
             if (state.players[i].getX() == state.players[playerId].getX() && state.players[i].getY() == state.players[playerId].getY() + 1) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
@@ -104,19 +104,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
     }
     // Check if the player can move left
     if (state.level.isEmpty(state.players[playerId].getX() - 1, state.players[playerId].getY())) {
-        bool canPlay = false;
+        bool canPlay = true;
         
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
             if (state.bombs[i].getX() == state.players[playerId].getX() - 1 && state.bombs[i].getY() == state.players[playerId].getY()) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
             if (state.players[i].getX() == state.players[playerId].getX() - 1 && state.players[i].getY() == state.players[playerId].getY()) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
@@ -126,19 +126,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
     }
     // Check if the player can move right
     if (state.level.isEmpty(state.players[playerId].getX() + 1, state.players[playerId].getY())) {
-        bool canPlay = false;
+        bool canPlay = true;
         
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
             if (state.bombs[i].getX() == state.players[playerId].getX() + 1 && state.bombs[i].getY() == state.players[playerId].getY()) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
             if (state.players[i].getX() == state.players[playerId].getX() + 1 && state.players[i].getY() == state.players[playerId].getY()) {
-                canPlay = true;
+                canPlay = false;
                 break;
             }
         }
@@ -150,6 +150,7 @@ std::vector<Action> getPossibleActions(GameState& state) {
     // Add other possible actions here
     if (state.players[playerId].getNumBombs() > 0)
         possibleActions.push_back(PLACE_BOMB);
+    possibleActions.push_back(NO_ACTION);
 
     return possibleActions;
 }
@@ -229,8 +230,11 @@ Action MCTS::findBestAction(GameState currentState) {
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
         std::cout << "Simulation " << i << std::endl;
         Node* node = treePolicy(root);
+        std::cout << "Node: " << node->state.players[1].getX() << " " << node->state.players[1].getY() << std::endl;
         int result = defaultPolicy(node->state);
+        std::cout << "Result: " << result << std::endl;
         backpropagate(node, result);
+        std::cout << "Backpropagated" << std::endl;
     }
 
     return bestChild(root)->actionTaken;
