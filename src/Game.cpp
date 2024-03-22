@@ -133,8 +133,7 @@ void Game::processEvents()
                         gameState.players[0].getY(),
                         DEFAULT_BOMB_TIMER,
                         gameState.players[0].getStrength(),
-                        &gameState.players[0],
-                        zoom
+                        &gameState.players[0]
                     ));
                 }
             }
@@ -146,8 +145,8 @@ void Game::update()
 {
     // Update the players
     for (int i = 0; i < 2; ++i) {
-        gameState.players[i].update(*this);
-        PlayerCheckBonus(gameState.players[i]);
+        //gameState.players[i].update(*this);
+        gameState.PlayerCheckBonus(gameState.players[i]);   
     }
 
     // Update the bombs
@@ -270,13 +269,4 @@ bool Game::isLegalMove(int x, int y, std::optional<Player> player) {
         return true;
     }
     return false;
-}
-
-void Game::PlayerCheckBonus(Player &player) {
-    for (long unsigned i = 0; i < gameState.bonuses.size(); ++i) {
-        if (player.getX() == gameState.bonuses[i].getX() && player.getY() == gameState.bonuses[i].getY()) {
-            player.addBonus(gameState.bonuses[i].getType());
-            gameState.bonuses.erase(gameState.bonuses.begin() + i);
-        }
-    }
 }

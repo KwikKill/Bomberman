@@ -36,8 +36,6 @@ public:
     std::vector<Bomb> &getBombs() { return gameState.bombs; }
 
     bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
-
-    void PlayerCheckBonus(Player &player);
 };
 
 #endif // GAME_H

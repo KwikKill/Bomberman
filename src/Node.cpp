@@ -1,5 +1,6 @@
 #include "GameState.h"
 #include "Node.h"
+#include "Bomb.h"
 
 Node* bestChild(Node* node) {
     // Return the child node with the highest value
@@ -22,19 +23,143 @@ bool isTerminal(GameState state) {
     if(state.turns >= MAX_TURNS) {
         return true;
     }
+    return false;
+}
+
+std::vector<Action> getPossibleActions(GameState& state) {
+    std::vector<Action> possibleActions;
+
+    // Check if the player can move up
+    if (state.level.isEmpty(state.players[1].getX(), state.players[1].getY() - 1)) {
+        bool canPlay = false;
+
+        // check if there is a bomb at the position
+        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+            if (state.bombs[i].getX() == state.players[1].getX() && state.bombs[i].getY() == state.players[1].getY() - 1) {
+                canPlay = true;
+                break;
+            }
+        }
+        // check if there is a player at the position
+        for (int i = 0; i < 2; ++i) {
+            if (state.players[i].getX() == state.players[1].getX() && state.players[i].getY() == state.players[1].getY() - 1) {
+                canPlay = true;
+                break;
+            }
+        }
+        if (canPlay) {
+            possibleActions.push_back(MOVE_UP);
+        }
+    }
+    // Check if the player can move down
+    if (state.level.isEmpty(state.players[1].getX(), state.players[1].getY() + 1)) {
+        bool canPlay = false;
+        
+        // check if there is a bomb at the position
+        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+            if (state.bombs[i].getX() == state.players[1].getX() && state.bombs[i].getY() == state.players[1].getY() + 1) {
+                canPlay = true;
+                break;
+            }
+        }
+        // check if there is a player at the position
+        for (int i = 0; i < 2; ++i) {
+            if (state.players[i].getX() == state.players[1].getX() && state.players[i].getY() == state.players[1].getY() + 1) {
+                canPlay = true;
+                break;
+            }
+        }
+        if (canPlay) {
+            possibleActions.push_back(MOVE_DOWN);
+        }
+    }
+    // Check if the player can move left
+    if (state.level.isEmpty(state.players[1].getX() - 1, state.players[1].getY())) {
+        bool canPlay = false;
+        
+        // check if there is a bomb at the position
+        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+            if (state.bombs[i].getX() == state.players[1].getX() - 1 && state.bombs[i].getY() == state.players[1].getY()) {
+                canPlay = true;
+                break;
+            }
+        }
+        // check if there is a player at the position
+        for (int i = 0; i < 2; ++i) {
+            if (state.players[i].getX() == state.players[1].getX() - 1 && state.players[i].getY() == state.players[1].getY()) {
+                canPlay = true;
+                break;
+            }
+        }
+        if (canPlay) {
+            possibleActions.push_back(MOVE_LEFT);
+        }
+    }
+    // Check if the player can move right
+    if (state.level.isEmpty(state.players[1].getX() + 1, state.players[1].getY())) {
+        bool canPlay = false;
+        
+        // check if there is a bomb at the position
+        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+            if (state.bombs[i].getX() == state.players[1].getX() + 1 && state.bombs[i].getY() == state.players[1].getY()) {
+                canPlay = true;
+                break;
+            }
+        }
+        // check if there is a player at the position
+        for (int i = 0; i < 2; ++i) {
+            if (state.players[i].getX() == state.players[1].getX() + 1 && state.players[i].getY() == state.players[1].getY()) {
+                canPlay = true;
+                break;
+            }
+        }
+        if (canPlay) {
+            possibleActions.push_back(MOVE_RIGHT);
+        }
+    }
+
+    // Add other possible actions here
+    possibleActions.push_back(PLACE_BOMB);
+
+    return possibleActions;
 }
 
 bool isFullyExpanded(Node* node) {
     // Check if all possible actions have been tried
-}
-
-std::vector<Action> getPossibleActions(const GameState& state) {
-    // Get possible actions
-    
+    return node->children.size() == getPossibleActions(node->state).size();
 }
 
 GameState getNewState(const GameState& state, Action action) {
     // Get the new game state resulting from taking the action
+    GameState newState = state;
+
+    switch (action) {
+        case MOVE_UP:
+            newState.players[1].move(0, -1);
+            break;
+        case MOVE_DOWN:
+            newState.players[1].move(0, 1);
+            break;
+        case MOVE_LEFT:
+            newState.players[1].move(-1, 0);
+            break;
+        case MOVE_RIGHT:
+            newState.players[1].move(1, 0);
+            break;
+        case PLACE_BOMB:
+            newState.bombs.push_back(
+                Bomb(
+                    newState.players[1].getX(),
+                    newState.players[1].getY(),
+                    DEFAULT_BOMB_TIMER,
+                    newState.players[1].getStrength(),
+                    &newState.players[1]
+                )
+            );
+            break;
+        default:
+            break;
+    }
 }
 
 Node* expand(Node* node) {

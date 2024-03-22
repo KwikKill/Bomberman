@@ -15,7 +15,7 @@ Bomb::Bomb() {
     strength = 1;
 }
 
-Bomb::Bomb(int x, int y, int timer, int strength, Player *owner, int zoom) {
+Bomb::Bomb(int x, int y, int timer, int strength, Player *owner) {
     this->x = x;
     this->y = y;
     time_left = timer;
@@ -32,11 +32,11 @@ Bomb::Bomb(int x, int y, int timer, int strength, Player *owner, int zoom) {
     if (!texture.loadFromFile(texturePath)) {
         // handle error
     }
-    sprite.scale(1.0/zoom, 1.0/zoom);
     sprite.setTexture(texture);
 }
 
 void Bomb::draw(sf::RenderWindow &window, int zoom) {
+    sprite.setScale(1.0/zoom, 1.0/zoom);
     sprite.setTexture(texture);
     sprite.setPosition(
         (x * TILE_SIZE)/zoom,

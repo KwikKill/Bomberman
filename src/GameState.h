@@ -27,6 +27,8 @@ public:
 
     Winner winner;
     int turns;
+
+    void PlayerCheckBonus(Player &player);
 };
 
 #endif // GAMESTATE_H
