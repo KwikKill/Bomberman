@@ -230,13 +230,17 @@ Action MCTS::findBestAction(GameState currentState) {
     Node* root = new Node(std::move(currentState), NO_ACTION, nullptr);
 
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
-        //std::cout << "Simulation " << i << std::endl;
+        std::cout << "Simulation " << i << std::endl;
         Node* node = treePolicy(root);
         //std::cout << "Node: " << node->state.players[1].getX() << " " << node->state.players[1].getY() << std::endl;
         int result = defaultPolicy(node->state);
         //std::cout << "Result: " << result << std::endl;
         backpropagate(node, result);
         //std::cout << "Backpropagated" << std::endl;
+    }
+
+    for (Node* child : root->children) {
+        std::cout << "Action: " << child->actionTaken << " Wins: " << child->wins << " Visits: " << child->visits << std::endl;
     }
 
     return bestChild(root)->actionTaken;
