@@ -1,3 +1,6 @@
+#ifndef GAMESTATE_H
+#define GAMESTATE_H
+
 #include "Level.h"
 #include "Player.h"
 #include "Bomb.h"
@@ -23,4 +26,7 @@ public:
     std::vector<Flame> flames;
 
     Winner winner;
+    int turns;
 };
+
+#endif // GAMESTATE_H

@@ -13,6 +13,7 @@ Game::Game() {
     gameState.AIturn = false;
     gameState.winner = NO_WINNER;
     gameState.level = Level();
+    gameState.turns = 0;
 }
 
 void Game::load(unsigned int level_nb) {
@@ -76,6 +77,7 @@ void Game::run()
             render();
             if (gameState.AIturn) {
                 update();
+                gameState.turns++;
             }
 
             window.display(); // End the current frame and display everything
