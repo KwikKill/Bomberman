@@ -14,7 +14,17 @@ enum PlayerType
     AI,
 };
 
+class GameState;
 class Game;
+
+enum Action {
+    NO_ACTION,
+    MOVE_UP,
+    MOVE_DOWN,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    PLACE_BOMB
+};
 
 class Player
 {
@@ -30,11 +40,13 @@ private:
     int strength;
     int numBombs;
 
+    void move(int dx, int dy);
+
 public:
     Player();
     Player(int x, int y, int speed, std::string texturePath, PlayerType type, int zoom);
     void draw(sf::RenderWindow &window, int zoom);
-    void move(int dx, int dy);
+    void play(Action action, GameState &state);
 
     void update(Game &game);
 
@@ -50,6 +62,7 @@ public:
     void addBonus(int type);
 
     bool isAlive() const { return alive; }
+    bool isLegalMove(int x, int y, GameState &state);
 };
 
 #endif // PLAYER_P

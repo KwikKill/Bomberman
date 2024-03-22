@@ -34,8 +34,6 @@ public:
     Level &getLevel() { return gameState.level; }
     Player *getPlayers() { return gameState.players; }
     std::vector<Bomb> &getBombs() { return gameState.bombs; }
-
-    bool isLegalMove(int x, int y, std::optional<Player> player = std::nullopt);
 };
 
 #endif // GAME_H

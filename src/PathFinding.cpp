@@ -1,4 +1,4 @@
-#include "PathFinding.h"
+/* #include "PathFinding.h"
 #include <optional>
 
 std::vector<std::pair<int, int>> PathFinding::getLegalMoves(int x, int y, Game &game, std::optional<Player> player) {
@@ -95,4 +95,4 @@ std::vector<std::pair<int, int>> PathFinding::findNearestSafePath(int x, int y, 
         }
     }
     return path;
-}
+} */

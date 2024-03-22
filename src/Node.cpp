@@ -139,33 +139,7 @@ GameState getNewState(const GameState& state, Action action) {
     // Get the new game state resulting from taking the action
     GameState newState = state;
 
-    switch (action) {
-        case MOVE_UP:
-            newState.players[1].move(0, -1);
-            break;
-        case MOVE_DOWN:
-            newState.players[1].move(0, 1);
-            break;
-        case MOVE_LEFT:
-            newState.players[1].move(-1, 0);
-            break;
-        case MOVE_RIGHT:
-            newState.players[1].move(1, 0);
-            break;
-        case PLACE_BOMB:
-            newState.bombs.push_back(
-                Bomb(
-                    newState.players[1].getX(),
-                    newState.players[1].getY(),
-                    DEFAULT_BOMB_TIMER,
-                    newState.players[1].getStrength(),
-                    &newState.players[1]
-                )
-            );
-            break;
-        default:
-            break;
-    }
+    newState.players[1].play(action, newState);
 }
 
 Node* expand(Node* node) {

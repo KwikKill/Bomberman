@@ -24,10 +24,11 @@ Bomb::Bomb(int x, int y, int timer, int strength, Player *owner) {
 
     std::cout << "Time left : " << time_left << std::endl;
     std::cout << "Size : " << bombTextures->size() << std::endl;
-    if (time_left > (int) bombTextures->size() - 1) {
-        time_left = bombTextures->size() - 1;
+    int textureIndex = time_left;
+    if (textureIndex > (int) bombTextures->size() - 1) {
+        textureIndex = bombTextures->size() - 1;
     }
-    std::string texturePath = bombTextures->at(time_left);
+    std::string texturePath = bombTextures->at(textureIndex);
 
     if (!texture.loadFromFile(texturePath)) {
         // handle error

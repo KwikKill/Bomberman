@@ -1,4 +1,4 @@
-#ifndef PATHFINDING_H
+/* #ifndef PATHFINDING_H
 #define PATHFINDING_H
 
 #include <SFML/Graphics.hpp>
@@ -27,4 +27,4 @@ public:
     static bool isSafe(int x, int y, Game &game, std::optional<Player> player = std::nullopt);
 };
 
-#endif // PATHFINDING_H
+#endif // PATHFINDING_H */

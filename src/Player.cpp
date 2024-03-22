@@ -1,7 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include "Player.h"
 #include "Game.h"
-#include "PathFinding.h"
+//#include "PathFinding.h"
+#include "GameState.h"
 
 Player::Player() {
     x = 0;
@@ -43,9 +44,50 @@ void Player::move(int dx, int dy) {
     y += dy * speed;
 }
 
+void Player::play(Action action, GameState &state) {
+        switch (action) {
+        case MOVE_UP:
+            if(isLegalMove(x, y-1, state)) {
+                move(0, -1);
+            }
+            break;
+        case MOVE_DOWN:
+            if(isLegalMove(x, y+1, state)) {
+                move(0, 1);
+            }
+            break;
+        case MOVE_LEFT:
+            if(isLegalMove(x-1, y, state)) {
+                move(-1, 0);
+            }
+            break;
+        case MOVE_RIGHT:
+            if(isLegalMove(x+1, y, state)) {
+                move(1, 0);
+            }
+            break;
+        case PLACE_BOMB:
+            if (dropBomb()) {
+                state.bombs.push_back(
+                    Bomb(
+                        x,
+                        y,
+                        DEFAULT_BOMB_TIMER,
+                        strength,
+                        this
+                    )
+                );
+            }
+            break;
+        default:
+            break;
+    }
+
+}
+
 void Player::update(Game &game) {
     if (type == AI) {
-        if(!PathFinding::isSafe(x, y, game, *this)) {
+        /*if(!PathFinding::isSafe(x, y, game, *this)) {
             std::vector<std::pair<int, int>> path = PathFinding::findNearestSafePath(x, y, game, *this);
             
             if (path.size() > 0) {
@@ -54,7 +96,7 @@ void Player::update(Game &game) {
                 // move uses the difference between the current position and the next position
                 move(nextMove.first-x, nextMove.second-y);
             }
-        }
+        }*/
     }
 }
 
@@ -78,4 +120,26 @@ void Player::addBonus(int type) {
     } else if (type == NUMBOMB) {
         numBombs++;
     }
+}
+
+bool Player::isLegalMove(int x, int y, GameState &state) {
+    if(state.level.isEmpty(x, y)) {
+        // Check if there is a bomb at the position
+        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+            if (state.bombs[i].getX() == x && state.bombs[i].getY() == y) {
+                return false;
+            }
+        }
+        // Check if there is a player at the position
+        for (int i = 0; i < 2; ++i) {
+            if(this->x == x && this->y == y) {
+                return false;
+            }
+            if (state.players[i].getX() == x && state.players[i].getY() == y) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }

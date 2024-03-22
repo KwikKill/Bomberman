@@ -6,15 +6,6 @@
 #define NUM_SIMULATIONS 1000
 #define MAX_TURNS 100
 
-enum Action {
-    NO_ACTION,
-    MOVE_UP,
-    MOVE_DOWN,
-    MOVE_LEFT,
-    MOVE_RIGHT,
-    PLACE_BOMB
-};
-
 class Node {
 public:
     GameState state;

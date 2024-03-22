@@ -106,36 +106,20 @@ void Game::processEvents()
         else if (event.type == sf::Event::KeyPressed) {
             // print player strength and number of bombs
             if (event.key.code == sf::Keyboard::Up) {
-                if(isLegalMove(gameState.players[0].getX(), gameState.players[0].getY() - 1)) {
-                    gameState.players[0].move(0, -1);
-                }
+                gameState.players[0].play(MOVE_UP, gameState);
                 gameState.AIturn = true;
             } else if (event.key.code == sf::Keyboard::Down) {
-                if(isLegalMove(gameState.players[0].getX(), gameState.players[0].getY() + 1)) {
-                    gameState.players[0].move(0, 1);
-                }
+                gameState.players[0].play(MOVE_DOWN, gameState);
                 gameState.AIturn = true;
             } else if (event.key.code == sf::Keyboard::Left) {
-                if(isLegalMove(gameState.players[0].getX() - 1, gameState.players[0].getY())) {
-                    gameState.players[0].move(-1, 0);
-                }
+                gameState.players[0].play(MOVE_LEFT, gameState);
                 gameState.AIturn = true;
             } else if (event.key.code == sf::Keyboard::Right) {
-                if(isLegalMove(gameState.players[0].getX() + 1, gameState.players[0].getY())) {
-                    gameState.players[0].move(1, 0);
-                }
+                gameState.players[0].play(MOVE_RIGHT, gameState);
                 gameState.AIturn = true;
             } else if (event.key.code == sf::Keyboard::Space) {
-                if(gameState.players[0].dropBomb()) {
-                    // Create a new bomb
-                    gameState.bombs.push_back(Bomb(
-                        gameState.players[0].getX(),
-                        gameState.players[0].getY(),
-                        DEFAULT_BOMB_TIMER,
-                        gameState.players[0].getStrength(),
-                        &gameState.players[0]
-                    ));
-                }
+                gameState.players[0].play(PLACE_BOMB, gameState);
+                gameState.AIturn = true;
             }
         }
     }
@@ -145,12 +129,13 @@ void Game::update()
 {
     // Update the players
     for (int i = 0; i < 2; ++i) {
-        //gameState.players[i].update(*this);
+        gameState.players[i].update(*this);
         gameState.PlayerCheckBonus(gameState.players[i]);   
     }
 
     // Update the bombs
     for (int i = gameState.bombs.size() - 1; i >= 0; --i) {
+        std::cout << "bomb " << i << " time left: " << gameState.bombs[i].getTimeLeft() << std::endl;
         if(gameState.bombs[i].getTimeLeft() > 0) {
             gameState.bombs[i].update();
             gameState.bombs[i].changeTexture();
@@ -247,26 +232,4 @@ void Game::render()
 
     // Draw the HUD
     HUD::draw(window, *this);
-}
-
-bool Game::isLegalMove(int x, int y, std::optional<Player> player) {
-    if(gameState.level.isEmpty(x, y)) {
-        // Check if there is a bomb at the position
-        for (long unsigned i = 0; i < gameState.bombs.size(); ++i) {
-            if (gameState.bombs[i].getX() == x && gameState.bombs[i].getY() == y) {
-                return false;
-            }
-        }
-        // Check if there is a player at the position
-        for (int i = 0; i < 2; ++i) {
-            if(player.has_value() && player.value().getX() == x && player.value().getY() == y) {
-                continue;
-            }
-            if (gameState.players[i].getX() == x && gameState.players[i].getY() == y) {
-                return false;
-            }
-        }
-        return true;
-    }
-    return false;
 }
