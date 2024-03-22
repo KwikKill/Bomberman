@@ -22,8 +22,8 @@ Bomb::Bomb(int x, int y, int timer, int strength, Player *owner) {
     this->strength = strength;
     this->owner = owner;
 
-    std::cout << "Time left : " << time_left << std::endl;
-    std::cout << "Size : " << bombTextures->size() << std::endl;
+    //std::cout << "Time left : " << time_left << std::endl;
+    //std::cout << "Size : " << bombTextures->size() << std::endl;
     int textureIndex = time_left;
     if (textureIndex > (int) bombTextures->size() - 1) {
         textureIndex = bombTextures->size() - 1;
@@ -84,10 +84,11 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
             if (level.isDestroyable(new_x, new_y)) {
                 level.destroyWall(new_x, new_y);
                 if (rand() % 100 < BONUS_SPAWN_CHANCE) {
-                    std::cout << "Bonus " << new_x << " " << new_y << std::endl;
-
-                    bonuses.emplace_back(new_x, new_y, Bonus::getRandomType());
-                    std::cout << "Bonus : " << bonuses.size() << std::endl;
+                    //std::cout << "Bonus " << new_x << " " << new_y << std::endl;
+                    bonuses.push_back(
+                        Bonus(new_x, new_y, Bonus::getRandomType())
+                    );
+                    //std::cout << "Bonus : " << bonuses.size() << std::endl;
                 }
                 flamePositions.emplace_back(new_x, new_y);
                 break;

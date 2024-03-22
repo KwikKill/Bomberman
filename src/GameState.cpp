@@ -12,7 +12,7 @@ void GameState::PlayerCheckBonus(Player &player) {
 
 void GameState::update()
 {
-    std::cout << "Turn " << turns << std::endl;
+    //std::cout << "Turn " << turns << std::endl;
 
     // Update the players
     for (int i = 0; i < 2; ++i) {
@@ -21,7 +21,7 @@ void GameState::update()
     
     // Update the bombs
     for (int i = bombs.size() - 1; i >= 0; --i) {
-        std::cout << "bomb " << i << " time left: " << bombs[i].getTimeLeft() << std::endl;
+        //std::cout << "bomb " << i << " time left: " << bombs[i].getTimeLeft() << std::endl;
         if(bombs[i].getTimeLeft() > 0) {
             bombs[i].update();
             bombs[i].changeTexture();

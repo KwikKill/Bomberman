@@ -5,7 +5,7 @@
 #include "GameState.h"
 
 #define NUM_SIMULATIONS 1000
-#define MAX_TURNS 1000
+#define MAX_TURNS 100
 
 class MCTS {
 public:

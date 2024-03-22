@@ -184,7 +184,7 @@ int defaultPolicy(GameState state) {
 
     if (state.winner == NO_WINNER) {
         return 0;
-    } else if (state.winner == PLAYER1) {
+    } else if (state.winner == PLAYER2) {
         return 1;
     } else {
         return -1;
