@@ -29,20 +29,25 @@ bool isTerminal(GameState state) {
 std::vector<Action> getPossibleActions(GameState& state) {
     std::vector<Action> possibleActions;
 
+    int playerId = 0;
+
+    if (state.AIturn)
+        playerId = 1;
+
     // Check if the player can move up
-    if (state.level.isEmpty(state.players[1].getX(), state.players[1].getY() - 1)) {
+    if (state.level.isEmpty(state.players[playerId].getX(), state.players[playerId].getY() - 1)) {
         bool canPlay = false;
 
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[1].getX() && state.bombs[i].getY() == state.players[1].getY() - 1) {
+            if (state.bombs[i].getX() == state.players[playerId].getX() && state.bombs[i].getY() == state.players[playerId].getY() - 1) {
                 canPlay = true;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[1].getX() && state.players[i].getY() == state.players[1].getY() - 1) {
+            if (state.players[i].getX() == state.players[playerId].getX() && state.players[i].getY() == state.players[playerId].getY() - 1) {
                 canPlay = true;
                 break;
             }
@@ -52,19 +57,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
         }
     }
     // Check if the player can move down
-    if (state.level.isEmpty(state.players[1].getX(), state.players[1].getY() + 1)) {
+    if (state.level.isEmpty(state.players[playerId].getX(), state.players[playerId].getY() + 1)) {
         bool canPlay = false;
         
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[1].getX() && state.bombs[i].getY() == state.players[1].getY() + 1) {
+            if (state.bombs[i].getX() == state.players[playerId].getX() && state.bombs[i].getY() == state.players[playerId].getY() + 1) {
                 canPlay = true;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[1].getX() && state.players[i].getY() == state.players[1].getY() + 1) {
+            if (state.players[i].getX() == state.players[playerId].getX() && state.players[i].getY() == state.players[playerId].getY() + 1) {
                 canPlay = true;
                 break;
             }
@@ -74,19 +79,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
         }
     }
     // Check if the player can move left
-    if (state.level.isEmpty(state.players[1].getX() - 1, state.players[1].getY())) {
+    if (state.level.isEmpty(state.players[playerId].getX() - 1, state.players[playerId].getY())) {
         bool canPlay = false;
         
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[1].getX() - 1 && state.bombs[i].getY() == state.players[1].getY()) {
+            if (state.bombs[i].getX() == state.players[playerId].getX() - 1 && state.bombs[i].getY() == state.players[playerId].getY()) {
                 canPlay = true;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[1].getX() - 1 && state.players[i].getY() == state.players[1].getY()) {
+            if (state.players[i].getX() == state.players[playerId].getX() - 1 && state.players[i].getY() == state.players[playerId].getY()) {
                 canPlay = true;
                 break;
             }
@@ -96,19 +101,19 @@ std::vector<Action> getPossibleActions(GameState& state) {
         }
     }
     // Check if the player can move right
-    if (state.level.isEmpty(state.players[1].getX() + 1, state.players[1].getY())) {
+    if (state.level.isEmpty(state.players[playerId].getX() + 1, state.players[playerId].getY())) {
         bool canPlay = false;
         
         // check if there is a bomb at the position
         for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[1].getX() + 1 && state.bombs[i].getY() == state.players[1].getY()) {
+            if (state.bombs[i].getX() == state.players[playerId].getX() + 1 && state.bombs[i].getY() == state.players[playerId].getY()) {
                 canPlay = true;
                 break;
             }
         }
         // check if there is a player at the position
         for (int i = 0; i < 2; ++i) {
-            if (state.players[i].getX() == state.players[1].getX() + 1 && state.players[i].getY() == state.players[1].getY()) {
+            if (state.players[i].getX() == state.players[playerId].getX() + 1 && state.players[i].getY() == state.players[playerId].getY()) {
                 canPlay = true;
                 break;
             }
@@ -119,7 +124,8 @@ std::vector<Action> getPossibleActions(GameState& state) {
     }
 
     // Add other possible actions here
-    possibleActions.push_back(PLACE_BOMB);
+    if (state.players[playerId].getNumBombs() > 0)
+        possibleActions.push_back(PLACE_BOMB);
 
     return possibleActions;
 }
