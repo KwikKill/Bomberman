@@ -182,14 +182,6 @@ GameState getNewState(const GameState& state, Action action, bool AIturn) {
 int defaultPolicy(GameState state, int depth = 0) {
     // Simulate a random game and return the result
 
-
-    while (!isTerminal(state)) {
-        std::vector<Action> possibleActions = getPossibleActions(state);
-
-        Action action = possibleActions[rand() % possibleActions.size()];
-
-        state = getNewState(state, action);
-        
     while (!isTerminal(state, depth)) {
         /*if(!PathFinding::isSafe(state.players[0].getX(), state.players[0].getY(), state, state.players[0])) {
             std::vector<Action> path = PathFinding::findNearestSafePath(state.players[0].getX(), state.players[0].getY(), state, state.players[0]);
