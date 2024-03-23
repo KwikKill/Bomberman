@@ -1,4 +1,4 @@
-/* #ifndef PATHFINDING_H
+#ifndef PATHFINDING_H
 #define PATHFINDING_H
 
 #include <SFML/Graphics.hpp>
@@ -6,25 +6,26 @@
 #include <vector>
 #include <optional>
 
-#include "Game.h"
+#include "GameState.h"
 #include "Player.h"
 
 class PathFinding
 {
 private:
-    struct Node
+    struct PathFindingNode
     {
         int x;
         int y;
         int distance;
-        Node *parent;
+        Action action;
+        PathFindingNode *parent;
     };
 
-    static std::vector<std::pair<int, int>> getLegalMoves(int x, int y, Game &game, std::optional<Player> player = std::nullopt);
+    static std::vector<Action> getLegalMoves(int x, int y, GameState &state, Player player);
 
 public:
-    static std::vector<std::pair<int, int>> findNearestSafePath(int x, int y, Game &game, std::optional<Player> player = std::nullopt);
-    static bool isSafe(int x, int y, Game &game, std::optional<Player> player = std::nullopt);
+    static std::vector<Action> findNearestSafePath(int x, int y, GameState &state, Player player);
+    static bool isSafe(int x, int y, GameState &state, Player player);
 };
 
-#endif // PATHFINDING_H */
+#endif // PATHFINDING_H

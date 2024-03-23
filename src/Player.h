@@ -29,6 +29,7 @@ enum Action {
 class Player
 {
 private:
+    int id;
     int x;
     int y;
     int speed;
@@ -43,8 +44,7 @@ private:
     void move(int dx, int dy);
 
 public:
-    Player();
-    Player(int x, int y, int speed, std::string texturePath, PlayerType type, int zoom);
+    Player(int id, int x, int y, int speed, std::string texturePath, PlayerType type, int zoom);
     void draw(sf::RenderWindow &window, int zoom);
     void play(Action action, GameState &state);
 

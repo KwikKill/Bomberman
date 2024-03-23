@@ -19,7 +19,7 @@ Game::Game() {
 
 void Game::load(unsigned int level_nb) {
     // Create a new level
-    gameState.level.load(level_nb);
+    std::vector<Bomb> bombs = gameState.level.load(level_nb);
 
     zoom = 1.0;
 
@@ -40,29 +40,32 @@ void Game::load(unsigned int level_nb) {
         "Bomberman",
         sf::Style::Titlebar | sf::Style::Close
     );
-    window.setFramerateLimit(60); // Limit the frame rate to 60 frames per second
+    //window.setFramerateLimit(60); // Limit the frame rate to 60 frames per second
 
     // Randomly choose a spawn position for the player
     std::vector<std::pair<int, int>> spawnPositions = gameState.level.getSpawnPositions();
     int randomIndex = rand() % spawnPositions.size();
 
     // Create the players and set their positions
-    gameState.players[0] = Player(
+    gameState.players.push_back(Player(
+        0,
         spawnPositions[randomIndex].first,
         spawnPositions[randomIndex].second,
         DEFAULT_PLAYER_SPEED,
         "assets/img/player.png",
         PLAYER,
         zoom
-    );
-    gameState.players[1] = Player(
+    ));
+    gameState.players.push_back(Player(
+        1,
         spawnPositions[(randomIndex + 1) % spawnPositions.size()].first,
         spawnPositions[(randomIndex + 1) % spawnPositions.size()].second,
         DEFAULT_PLAYER_SPEED,
         "assets/img/ai.png",
         AI,
         zoom
-    );
+    ));
+    gameState.bombs = bombs;
 }
 
 void Game::run()
@@ -128,7 +131,7 @@ void Game::processEvents()
 void Game::update()
 {
     // Update the players
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < gameState.players.size(); ++i) {
         gameState.players[i].update(gameState);
     }
 
@@ -142,7 +145,7 @@ void Game::render()
     gameState.level.draw(window, zoom);
     
     // Draw the players
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < gameState.players.size(); ++i) {
         gameState.players[i].draw(window, zoom);
     }
 

@@ -6,17 +6,8 @@
 #include "Node.h"
 #include "MCTS.h"
 
-Player::Player() {
-    x = 0;
-    y = 0;
-    speed = 0;
-    type = PLAYER;
-    alive = true;
-    strength = DEFAULT_PLAYER_STRENGTH;
-    numBombs = DEFAULT_PLAYER_BOMBS;
-}
-
-Player::Player(int x, int y, int speed, std::string texturePath, PlayerType type, int zoom) {
+Player::Player(int id, int x, int y, int speed, std::string texturePath, PlayerType type, int zoom) {
+    this->id = id;
     this->x = x;
     this->y = y;
     this->speed = speed;
@@ -76,7 +67,7 @@ void Player::play(Action action, GameState &state) {
                         y,
                         DEFAULT_BOMB_TIMER,
                         strength,
-                        this
+                        id
                     )
                 );
             }

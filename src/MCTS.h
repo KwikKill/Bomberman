@@ -5,11 +5,11 @@
 #include "GameState.h"
 
 #define NUM_SIMULATIONS 1000
-#define MAX_TURNS 100
+#define MAX_TURNS 500
 
 class MCTS {
 public:
-    static Action findBestAction(GameState currentState);
+    static Action findBestAction(GameState &currentState);
 };
 
 #endif // MCST_H

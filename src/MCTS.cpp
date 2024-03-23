@@ -2,9 +2,13 @@
 #include "Node.h"
 #include "MCTS.h"
 #include "Bomb.h"
+#include "fast_log.hpp"
 #include <cmath>
 #include <iostream>
 #include <utility>
+#include "PathFinding.h"
+
+fast_log fast_lg;
 
 Node* bestChild(Node* node) {
     // Return the child node with the highest value
@@ -14,7 +18,8 @@ Node* bestChild(Node* node) {
     Node* bestChild = nullptr;
 
     for (Node* child : node->children) {
-        double value = (double)child->wins / child->visits + sqrt(2 * log(node->visits) / child->visits);
+        const float log_of_N = fast_lg.log(node->visits);
+        double value = (double)child->wins / child->visits + sqrt(2 * log_of_N / child->visits);
 
         if (value > bestValue) {
             bestValue = value;
@@ -38,13 +43,13 @@ void backpropagate(Node* node, int result) {
 
 }
 
-bool isTerminal(const GameState& state) {
+bool isTerminal(const GameState& state, int depth = 0) {
     // Check if the game is over
     if(state.winner != NO_WINNER) {
         return true;
     }
     // Check if the game is more than a certain number of turns
-    if(state.turns >= MAX_TURNS) {
+    if(state.turns - depth >= MAX_TURNS) {
         return true;
     }
     return false;
@@ -160,17 +165,23 @@ bool isFullyExpanded(Node* node) {
     return node->children.size() == getPossibleActions(node->state).size();
 }
 
-GameState getNewState(const GameState& state, Action action) {
+GameState getNewState(const GameState& state, Action action, bool AIturn) {
     // Get the new game state resulting from taking the action
     GameState newState = state;
 
-    newState.players[1].play(action, newState);
+    if (AIturn) {
+        newState.players[1].play(action, newState);
+    } else {
+        newState.players[0].play(action, newState);
+        newState.AIturn = true;
+    }
 
     return newState;
 }
 
-int defaultPolicy(GameState state) {
+int defaultPolicy(GameState state, int depth = 0) {
     // Simulate a random game and return the result
+
 
     while (!isTerminal(state)) {
         std::vector<Action> possibleActions = getPossibleActions(state);
@@ -179,6 +190,23 @@ int defaultPolicy(GameState state) {
 
         state = getNewState(state, action);
         
+    while (!isTerminal(state, depth)) {
+        /*if(!PathFinding::isSafe(state.players[0].getX(), state.players[0].getY(), state, state.players[0])) {
+            std::vector<Action> path = PathFinding::findNearestSafePath(state.players[0].getX(), state.players[0].getY(), state, state.players[0]);
+            Action actionPlayer = path[0];
+            
+            state = getNewState(state, actionPlayer, state.AIturn);
+            actions.push_back(std::make_pair(state.AIturn, actionPlayer));
+        } else {*/
+        std::vector<Action> possibleActionsPlayer = getPossibleActions(state);
+        Action actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
+        state = getNewState(state, actionPlayer, state.AIturn);
+        //}
+
+        std::vector<Action> possibleActionsAI = getPossibleActions(state);
+        Action actionAI = possibleActionsAI[rand() % possibleActionsAI.size()];
+        state = getNewState(state, actionAI, state.AIturn);
+
         state.update();
     }
 
@@ -197,17 +225,31 @@ Node* expand(Node* node) {
 
     // Remove actions that have already been tried
     for (Node* child : node->children) {
-        possibleActions.erase(std::remove(possibleActions.begin(), possibleActions.end(), child->actionTaken), possibleActions.end());
+        possibleActions.erase(
+            std::remove(
+                possibleActions.begin(),
+                possibleActions.end(),
+                child->actionTaken
+            ),
+            possibleActions.end()
+        );
     }
 
     // Choose a random action from the remaining actions
     Action action = possibleActions[rand() % possibleActions.size()];
 
+    GameState newState;
+    Node* newNode;
     // Get the new game state resulting from taking the action
-    GameState newState = getNewState(node->state, action);
-
-    // Create a new node for the new state
-    Node* newNode = new Node(newState, action, node);
+    if(node->state.AIturn) {
+        newState = getNewState(node->state, action, node->state.AIturn);
+        newState.update();
+        // Create a new node for the new state
+        newNode = new Node(newState, action, node, true);
+    } else {
+        newState = getNewState(node->state, action, node->state.AIturn);
+        newNode = new Node(newState, action, node, false);
+    }
 
     // Add the new node to the children of the current node
     node->children.push_back(newNode);
@@ -216,7 +258,7 @@ Node* expand(Node* node) {
 }
 
 Node* treePolicy(Node* node) {
-    while (!isTerminal(node->state)) {
+    while (!isTerminal(node->state, node->state.turns)) {
         if (!isFullyExpanded(node)) {
             return expand(node);
         } else {
@@ -226,22 +268,29 @@ Node* treePolicy(Node* node) {
     return node;
 }
 
-Action MCTS::findBestAction(GameState currentState) {
-    Node* root = new Node(std::move(currentState), NO_ACTION, nullptr);
+Action MCTS::findBestAction(GameState &currentState) {
+    Node* root = new Node(currentState, NO_ACTION, nullptr, true);
 
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
-        std::cout << "Simulation " << i << std::endl;
         Node* node = treePolicy(root);
-        //std::cout << "Node: " << node->state.players[1].getX() << " " << node->state.players[1].getY() << std::endl;
-        int result = defaultPolicy(node->state);
-        //std::cout << "Result: " << result << std::endl;
+        int result = defaultPolicy(node->state, node->state.turns);
         backpropagate(node, result);
-        //std::cout << "Backpropagated" << std::endl;
     }
 
+    if(root->children.size() == 0) {
+        std::cout << "No children" << std::endl;
+        return NO_ACTION;
+    }
     for (Node* child : root->children) {
         std::cout << "Action: " << child->actionTaken << " Wins: " << child->wins << " Visits: " << child->visits << std::endl;
     }
+
+    // Log the action that led to the loss
+    /*Node* current = bestChild(root);
+    while(current->children.size() > 0) {
+        std::cout << "Action of best child : " << current->actionTaken << std::endl;
+        current = bestChild(current);
+    }*/
 
     return bestChild(root)->actionTaken;
 }

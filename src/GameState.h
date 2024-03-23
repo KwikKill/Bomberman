@@ -19,7 +19,7 @@ class GameState
 {
 public:
     Level level;
-    Player players[2];
+    std::vector<Player> players;
     bool AIturn;
     std::vector<Bomb> bombs;
     std::vector<Bonus> bonuses;

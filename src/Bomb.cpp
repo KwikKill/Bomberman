@@ -15,7 +15,7 @@ Bomb::Bomb() {
     strength = 1;
 }
 
-Bomb::Bomb(int x, int y, int timer, int strength, Player *owner) {
+Bomb::Bomb(int x, int y, int timer, int strength, std::optional<int> owner) {
     this->x = x;
     this->y = y;
     time_left = timer;
@@ -50,16 +50,16 @@ void Bomb::update() {
     time_left--;
 }
 
-std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, int numPlayers, std::vector<Bonus> &bonuses) {
+std::vector<std::pair<int, int>> Bomb::explode(GameState &state) {
     std::vector<std::pair<int, int>> flamePositions;
 
     // Add flame position for the bomb itself
     flamePositions.emplace_back(x, y);
 
     // Check if the bomb is in the same position as a player
-    for (int i = 0; i < numPlayers; ++i) {
-        if (players[i].getX() == x && players[i].getY() == y) {
-            players[i].die();
+    for (int i = 0; i < state.players.size(); ++i) {
+        if (state.players[i].getX() == x && state.players[i].getY() == y) {
+            state.players[i].die();
         }
     }
 
@@ -81,11 +81,11 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
             int new_x = x + dx;
             int new_y = y + dy;
 
-            if (level.isDestroyable(new_x, new_y)) {
-                level.destroyWall(new_x, new_y);
+            if (state.level.isDestroyable(new_x, new_y)) {
+                state.level.destroyWall(new_x, new_y);
                 if (rand() % 100 < BONUS_SPAWN_CHANCE) {
                     //std::cout << "Bonus " << new_x << " " << new_y << std::endl;
-                    bonuses.push_back(
+                    state.bonuses.push_back(
                         Bonus(new_x, new_y, Bonus::getRandomType())
                     );
                     //std::cout << "Bonus : " << bonuses.size() << std::endl;
@@ -93,12 +93,12 @@ std::vector<std::pair<int, int>> Bomb::explode(Level &level, Player *players, in
                 flamePositions.emplace_back(new_x, new_y);
                 break;
             } else {
-                for (int k = 0; k < numPlayers; ++k) {
-                    if (players[k].getX() == new_x && players[k].getY() == new_y) {
-                        players[k].die();
+                for (int k = 0; k < state.players.size(); ++k) {
+                    if (state.players[k].getX() == new_x && state.players[k].getY() == new_y) {
+                        state.players[k].die();
                     }
                 }
-                if (level.isundestroyWall(new_x, new_y)) {
+                if (state.level.isundestroyWall(new_x, new_y)) {
                     break;
                 }
                 flamePositions.emplace_back(new_x, new_y);

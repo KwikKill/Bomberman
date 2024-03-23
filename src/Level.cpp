@@ -5,7 +5,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-void Level::load(unsigned int levelNumber) {
+std::vector<Bomb> Level::load(unsigned int levelNumber) {
 
     std::string filePath = "assets/levels/" + std::to_string(levelNumber) + ".txt";
     std::ifstream file(filePath);
@@ -28,6 +28,25 @@ void Level::load(unsigned int levelNumber) {
         file.close();
     }
 
+    // If this is a bomb tile "B", add a bomb to the game and replace the tile with a space
+    std::vector<Bomb> bombs;
+    for (size_t i = 0; i < height; ++i) {
+        for (size_t j = 0; j < width; ++j) {
+            if (levelData[i][j] == 'B') {
+                bombs.push_back(
+                    Bomb(
+                        j,
+                        i,
+                        DEFAULT_BOMB_TIMER,
+                        3,
+                        std::nullopt
+                    )
+                );
+                levelData[i][j] = ' ';
+            }
+        }
+    }
+
     // Find a random "S" tile to spawn the player
     for (size_t i = 0; i < height; ++i) {
         for (size_t j = 0; j < width; ++j) {
@@ -36,6 +55,8 @@ void Level::load(unsigned int levelNumber) {
             }
         }
     }
+
+    return bombs;
 }
 
 void Level::draw(sf::RenderWindow &window, int zoom) {

@@ -1,10 +1,13 @@
-#include <SFML/Graphics.hpp>
 
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
+
+class Bomb;
+class GameState;
 
 class Level {
 private:
@@ -15,7 +18,8 @@ private:
     std::vector<std::pair<int, int>> spawnPositions;
 
 public:
-    void load(unsigned int levelNumber);
+    // return a vector of all Bombs
+    std::vector<Bomb> load(unsigned int levelNumber);
     void draw(sf::RenderWindow &window, int zoom);
 
     bool isEmpty(int x, int y);

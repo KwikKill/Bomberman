@@ -32,7 +32,7 @@ public:
     void run();
 
     Level &getLevel() { return gameState.level; }
-    Player *getPlayers() { return gameState.players; }
+    std::vector<Player> &getPlayers() { return gameState.players; }
     std::vector<Bomb> &getBombs() { return gameState.bombs; }
 };
 

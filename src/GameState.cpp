@@ -15,7 +15,7 @@ void GameState::update()
     //std::cout << "Turn " << turns << std::endl;
 
     // Update the players
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < players.size(); ++i) {
         PlayerCheckBonus(players[i]);
     }
     
@@ -27,7 +27,7 @@ void GameState::update()
             bombs[i].changeTexture();
         } else {
             // Explode the bomb
-            std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
+            std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(*this);
 
             // Add the flames to the list of flames
             for (long unsigned j = 0; j < flamePositions.size(); ++j) {
@@ -36,7 +36,10 @@ void GameState::update()
                 );
             }
             // add a bomb to the player
-            bombs[i].getOwner()->addBomb();
+            std::optional<int> owner = bombs[i].getOwner();
+            if (owner.has_value()) {
+                players[owner.value()].addBomb();
+            }
             // Remove the bomb
             bombs.erase(bombs.begin() + i);
         }
@@ -50,13 +53,16 @@ void GameState::update()
             // if the bomb is on a flame, explode it
             for (long unsigned j = 0; j < flames.size(); ++j) {
                 if (bombs[i].getX() == flames[j].getX() && bombs[i].getY() == flames[j].getY()) {
-                    std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(level, players, 2, bonuses);
+                    std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(*this);
                     for (long unsigned j = 0; j < flamePositions.size(); ++j) {
                         flames.push_back(
                             Flame(flamePositions[j].first, flamePositions[j].second)
                         );
                     }
-                    bombs[i].getOwner()->addBomb();
+                    std::optional<int> owner = bombs[i].getOwner();
+                    if (owner.has_value()) {
+                        players[owner.value()].addBomb();
+                    }
                     bombs.erase(bombs.begin() + i);
                     explosion = true;
                     break;
@@ -75,7 +81,7 @@ void GameState::update()
     }
 
     int numAlive = 0;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < players.size(); ++i) {
         if (players[i].isAlive()) {
             numAlive++;
         }

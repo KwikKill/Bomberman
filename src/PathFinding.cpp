@@ -1,30 +1,31 @@
-/* #include "PathFinding.h"
+#include "PathFinding.h"
 #include <optional>
+#include <iostream>
 
-std::vector<std::pair<int, int>> PathFinding::getLegalMoves(int x, int y, Game &game, std::optional<Player> player) {
-    std::vector<std::pair<int, int>> legalMoves;
+std::vector<Action> PathFinding::getLegalMoves(int x, int y, GameState &state, Player player) {
+    std::vector<Action> legalMoves;
     // Check the 4 possible moves
-    if (game.isLegalMove(x + 1, y, player)) {
-        legalMoves.push_back(std::make_pair(1, 0));
+    if (player.isLegalMove(x + 1, y, state)) {
+        legalMoves.push_back(MOVE_RIGHT);
     }
-    if (game.isLegalMove(x - 1, y, player)) {
-        legalMoves.push_back(std::make_pair(-1, 0));
+    if (player.isLegalMove(x - 1, y, state)) {
+        legalMoves.push_back(MOVE_LEFT);
     }
-    if (game.isLegalMove(x, y + 1, player)) {
-        legalMoves.push_back(std::make_pair(0, 1));
+    if (player.isLegalMove(x, y + 1, state)) {
+        legalMoves.push_back(MOVE_DOWN);
     }
-    if (game.isLegalMove(x, y - 1, player)) {
-        legalMoves.push_back(std::make_pair(0, -1));
+    if (player.isLegalMove(x, y - 1, state)) {
+        legalMoves.push_back(MOVE_UP);
     }
     return legalMoves;
 }
 
-bool PathFinding::isSafe(int x, int y, Game &game, std::optional<Player> player) {
+bool PathFinding::isSafe(int x, int y, GameState &state, Player player) {
     // if is a legal move
-    if(!game.isLegalMove(x, y, player)) {
+    if(!player.isLegalMove(x, y, state)) {
         return false;
     }
-    for (Bomb &bomb : game.getBombs()) {
+    for (Bomb &bomb : state.bombs) {
         // Check the bomb explosion area
         for (int i = 0; i < 4; ++i) {
             for (int j = 1; j <= bomb.getStrength(); ++j) {
@@ -43,9 +44,9 @@ bool PathFinding::isSafe(int x, int y, Game &game, std::optional<Player> player)
                 int new_x = x + dx;
                 int new_y = y + dy;
 
-                if (game.getLevel().isDestroyable(new_x, new_y)) {
+                if (state.level.isDestroyable(new_x, new_y)) {
                     break;
-                } else if (game.getLevel().isundestroyWall(new_x, new_y)) {
+                } else if (state.level.isundestroyWall(new_x, new_y)) {
                     break;
                 } else if (new_x == bomb.getX() && new_y == bomb.getY()) {
                     return false;
@@ -56,43 +57,65 @@ bool PathFinding::isSafe(int x, int y, Game &game, std::optional<Player> player)
     return true;
 }
 
-std::vector<std::pair<int, int>> PathFinding::findNearestSafePath(int x, int y, Game &game, std::optional<Player> player) {
-    std::vector<std::pair<int, int>> path;
-    std::queue<Node*> queue;
+std::vector<Action> PathFinding::findNearestSafePath(int x, int y, GameState &state, Player player) {
+    std::vector<Action> path;
+    std::queue<PathFindingNode*> queue;
     queue.push(
-        new Node{
+        new PathFindingNode{
             x,
             y,
             0,
+            NO_ACTION,
             nullptr
         }
     );
-    std::vector<std::vector<bool>> visited(game.getLevel().getWidth(), std::vector<bool>(game.getLevel().getHeight(), false));
+    std::vector<std::vector<bool>> visited(state.level.getWidth(), std::vector<bool>(state.level.getHeight(), false));
     visited[x][y] = true;
 
     while (!queue.empty()) {
-        Node* current = queue.front();
+        PathFindingNode* current = queue.front();
         queue.pop();
 
-        if (isSafe(current->x, current->y, game, player)) {
+        if (isSafe(current->x, current->y, state, player)) {
             while (current->parent != nullptr) {
-                path.push_back(std::make_pair(current->x, current->y));
+                path.push_back(current->action);
                 current = current->parent;
             }
             std::reverse(path.begin(), path.end());
             return path;
         }
 
-        std::vector<std::pair<int, int>> legalMoves = getLegalMoves(current->x, current->y, game, player);
-        for (std::pair<int, int> move : legalMoves) {
-            int new_x = current->x + move.first;
-            int new_y = current->y + move.second;
+        std::vector<Action> legalMoves = getLegalMoves(current->x, current->y, state, player);
+        for (Action action : legalMoves) {
+            int dx = 0;
+            int dy = 0;
+            if (action == MOVE_UP) {
+                dy = -1;
+            } else if (action == MOVE_DOWN) {
+                dy = 1;
+            } else if (action == MOVE_LEFT) {
+                dx = -1;
+            } else if (action == MOVE_RIGHT) {
+                dx = 1;
+            }
+
+            int new_x = current->x + dx;
+            int new_y = current->y + dy;
+
             if (!visited[new_x][new_y]) {
                 visited[new_x][new_y] = true;
-                Node *newNode = new Node{new_x, new_y, current->distance + 1, current};
-                queue.push(newNode);
+                queue.push(
+                    new PathFindingNode{
+                        new_x,
+                        new_y,
+                        current->distance + 1,
+                        action,
+                        current
+                    }
+                );
             }
         }
     }
+    path.push_back(NO_ACTION);
     return path;
-} */
+}
