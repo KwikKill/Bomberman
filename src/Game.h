@@ -27,7 +27,13 @@ private:
     float zoom;
 
 public:
-    Game();
+    Game() {
+        gameState = GameState(
+            Level(),
+            std::vector<Player>(),
+            false
+        );
+    }
     void load(unsigned int level_nb);
     void run();
 

@@ -38,7 +38,7 @@ std::vector<Bomb> Level::load(unsigned int levelNumber) {
                         j,
                         i,
                         DEFAULT_BOMB_TIMER,
-                        3,
+                        1,
                         std::nullopt
                     )
                 );

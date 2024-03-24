@@ -6,16 +6,9 @@
 #include "Bomb.h"
 #include "Bonus.h"
 #include "HUD.h"
+#include "GameState.h"
 #include <optional>
 #include <algorithm>
-
-Game::Game() {
-    gameState.AIturn = false;
-    gameState.winner = NO_WINNER;
-    gameState.level = Level();
-    gameState.turns = 0;
-    zoom = 1.0;
-}
 
 void Game::load(unsigned int level_nb) {
     // Create a new level

@@ -18,6 +18,10 @@ enum Winner
 class GameState
 {
 public:
+    GameState() {}
+    GameState(Level level, std::vector<Player> players, bool AIturn)
+        : level(level), players(players), AIturn(AIturn), winner(NO_WINNER), turns(0) {}
+
     Level level;
     std::vector<Player> players;
     bool AIturn;

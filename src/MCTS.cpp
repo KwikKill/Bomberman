@@ -11,20 +11,31 @@
 fast_log fast_lg;
 
 Node* bestChild(Node* node) {
-    // Return the child node with the highest value
-
-    double bestValue = -1;
-
+    // Return the child node with the highest or lowest value based on node->AIturn
+    double bestValue = node->AIturn ? -1000000000 : 1000000000;
     Node* bestChild = nullptr;
 
     for (Node* child : node->children) {
         const float log_of_N = fast_lg.log(node->visits);
         double value = (double)child->wins / child->visits + sqrt(2 * log_of_N / child->visits);
 
-        if (value > bestValue) {
-            bestValue = value;
-            bestChild = child;
+        if (node->AIturn) {
+            // If AIturn is true, find the child with the highest value
+            if (value > bestValue) {
+                bestValue = value;
+                bestChild = child;
+            }
+        } else {
+            // If AIturn is false, find the child with the lowest value
+            if (value < bestValue) {
+                bestValue = value;
+                bestChild = child;
+            }
         }
+    }
+
+    if (bestChild == nullptr) {
+        std::cout << "No best child, This might be an error" << std::endl;
     }
 
     return bestChild;
@@ -181,25 +192,22 @@ GameState getNewState(const GameState& state, Action action, bool AIturn) {
 
 int defaultPolicy(GameState state, int depth = 0) {
     // Simulate a random game and return the result
-
+    std::vector<std::pair<int, Action>> actions;
     while (!isTerminal(state, depth)) {
-        /*if(!PathFinding::isSafe(state.players[0].getX(), state.players[0].getY(), state, state.players[0])) {
-            std::vector<Action> path = PathFinding::findNearestSafePath(state.players[0].getX(), state.players[0].getY(), state, state.players[0]);
-            Action actionPlayer = path[0];
-            
-            state = getNewState(state, actionPlayer, state.AIturn);
+        if(state.AIturn) {
+            std::vector<Action> possibleActionsAI = getPossibleActions(state);
+            Action actionAI = possibleActionsAI[rand() % possibleActionsAI.size()];
+            actions.push_back(std::make_pair(state.AIturn, actionAI));
+            state = getNewState(state, actionAI, state.AIturn);
+
+            state.update();
+        } else {
+            std::vector<Action> possibleActionsPlayer = getPossibleActions(state);
+
+            Action actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
             actions.push_back(std::make_pair(state.AIturn, actionPlayer));
-        } else {*/
-        std::vector<Action> possibleActionsPlayer = getPossibleActions(state);
-        Action actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
-        state = getNewState(state, actionPlayer, state.AIturn);
-        //}
-
-        std::vector<Action> possibleActionsAI = getPossibleActions(state);
-        Action actionAI = possibleActionsAI[rand() % possibleActionsAI.size()];
-        state = getNewState(state, actionAI, state.AIturn);
-
-        state.update();
+            state = getNewState(state, actionPlayer, state.AIturn);
+        }
     }
 
     if (state.winner == NO_WINNER) {
@@ -212,10 +220,11 @@ int defaultPolicy(GameState state, int depth = 0) {
 }
 
 Node* expand(Node* node) {
+
     // Get a list of possible actions from the current state
     std::vector<Action> possibleActions = getPossibleActions(node->state);
 
-    // Remove actions that have already been tried
+    // Remove actions that have already a node in the tree
     for (Node* child : node->children) {
         possibleActions.erase(
             std::remove(
@@ -230,18 +239,12 @@ Node* expand(Node* node) {
     // Choose a random action from the remaining actions
     Action action = possibleActions[rand() % possibleActions.size()];
 
-    GameState newState;
-    Node* newNode;
-    // Get the new game state resulting from taking the action
+    GameState newState = getNewState(node->state, action, node->state.AIturn);
+    // If the AI is playing, update the board
     if(node->state.AIturn) {
-        newState = getNewState(node->state, action, node->state.AIturn);
         newState.update();
-        // Create a new node for the new state
-        newNode = new Node(newState, action, node, true);
-    } else {
-        newState = getNewState(node->state, action, node->state.AIturn);
-        newNode = new Node(newState, action, node, false);
     }
+    Node* newNode = new Node(newState, action, node, true);    
 
     // Add the new node to the children of the current node
     node->children.push_back(newNode);
@@ -260,7 +263,17 @@ Node* treePolicy(Node* node) {
     return node;
 }
 
-Action MCTS::findBestAction(GameState &currentState) {
+void log_tree(Node* node, int depth = 0) {
+    for (int i = 0; i < depth; ++i) {
+        std::cout << "  ";
+    }
+    std::cout << "Action: " << node->actionTaken << " By " << !node->state.AIturn << " Wins: " << node->wins << " Visits: " << node->visits << std::endl;
+    for (Node* child : node->children) {
+        log_tree(child, depth + 1);
+    }
+}
+
+Action MCTS::findBestAction(GameState& currentState) {
     Node* root = new Node(currentState, NO_ACTION, nullptr, true);
 
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
@@ -273,16 +286,8 @@ Action MCTS::findBestAction(GameState &currentState) {
         std::cout << "No children" << std::endl;
         return NO_ACTION;
     }
-    for (Node* child : root->children) {
-        std::cout << "Action: " << child->actionTaken << " Wins: " << child->wins << " Visits: " << child->visits << std::endl;
-    }
 
-    // Log the action that led to the loss
-    /*Node* current = bestChild(root);
-    while(current->children.size() > 0) {
-        std::cout << "Action of best child : " << current->actionTaken << std::endl;
-        current = bestChild(current);
-    }*/
+    log_tree(root);
 
     return bestChild(root)->actionTaken;
 }
