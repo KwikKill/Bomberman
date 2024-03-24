@@ -273,6 +273,13 @@ void log_tree(Node* node, int depth = 0) {
     }
 }
 
+double calculateWinPercentage(Node* node) {
+    if (node->visits == 0) {
+        return 0.0;  // to avoid division by zero
+    }
+    return static_cast<double>(node->wins) / static_cast<double>(node->visits);
+}
+
 Action MCTS::findBestAction(GameState& currentState) {
     Node* root = new Node(currentState, NO_ACTION, nullptr, true);
 
@@ -288,6 +295,10 @@ Action MCTS::findBestAction(GameState& currentState) {
     }
 
     log_tree(root);
+    
+    Node* bestChildNode = bestChild(root);
+    // Write what the AI thinks is the it's winning percentage
+    std::cout << "Winning percentage: " << calculateWinPercentage(bestChildNode)*100 << std::endl;
 
-    return bestChild(root)->actionTaken;
+    return bestChildNode->actionTaken;
 }
