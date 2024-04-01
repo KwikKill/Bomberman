@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++17 -O3 -Wall -Werror -pedantic-errors -Iinclude -I ${PATH_TO_FFML}/include
+CXXFLAGS = -std=c++17 -Wall -O3 -ffast-math -pedantic-errors -Iinclude -I ${PATH_TO_FFML}/include
 
 # Linker flags
 LDFLAGS = -L ${PATH_TO_FFML}/lib
@@ -31,6 +31,11 @@ BIN = $(BIN_DIR)/main
 .PHONY: all clean
 
 all: $(BIN)
+
+debug: CXXFLAGS += -g -pg -fprofile-arcs -ftest-coverage
+debug: CXXFLAGS := $(filter-out -O3,$(CXXFLAGS))
+debug: LDFLAGS += -lgcov --coverage -pg
+debug: $(BIN)
 
 $(BIN): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)

@@ -95,6 +95,7 @@ void Player::update(GameState &gamestate) {
         Action action = mtcs.findBestAction(gamestate);
         std::cout << "Action: " << action << std::endl;
         play(action, gamestate);
+        exit(0);
     }
 }
 

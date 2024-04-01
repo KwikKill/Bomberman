@@ -3,23 +3,45 @@
 #include "MCTS.h"
 #include "Bomb.h"
 #include "fast_log.hpp"
+#include "PathFinding.h"
+
 #include <cmath>
 #include <iostream>
 #include <utility>
-#include "PathFinding.h"
+#include <thread>
+#include <mutex>
 
 fast_log fast_lg;
 
 Node* bestChild(Node* node) {
+    // If node->state.AIturn, return a random child node
+    if (!node->state.AIturn) {
+        std::cout << "Returning the lowest winrate child" << std::endl;
+        double wr = 1000000000;
+        Node* bestChild = nullptr;
+        for (Node* child : node->children) {
+            double child_wr = (double)child->wins / child->visits;
+            if (child_wr < wr) {
+                wr = child_wr;
+                bestChild = child;
+            }
+        }
+        return bestChild;
+    }
+
     // Return the child node with the highest or lowest value based on node->AIturn
-    double bestValue = node->AIturn ? -1000000000 : 1000000000;
+    double bestValue = node->state.AIturn ? -1000000000 : 1000000000;
     Node* bestChild = nullptr;
+
+    std::cout << "AIturn: " << node->state.AIturn << std::endl;
 
     for (Node* child : node->children) {
         const float log_of_N = fast_lg.log(node->visits);
         double value = (double)child->wins / child->visits + sqrt(2 * log_of_N / child->visits);
 
-        if (node->AIturn) {
+        //std::cout << "Child: " << child->actionTaken << " Wins: " << child->wins << " Visits: " << child->visits << " Value: " << value << std::endl;
+
+        if (node->state.AIturn) {
             // If AIturn is true, find the child with the highest value
             if (value > bestValue) {
                 bestValue = value;
@@ -36,6 +58,8 @@ Node* bestChild(Node* node) {
 
     if (bestChild == nullptr) {
         std::cout << "No best child, This might be an error" << std::endl;
+    } else {
+        //std::cout << "Best child: " << bestChild->actionTaken << " Wins: " << bestChild->wins << " Visits: " << bestChild->visits << std::endl;
     }
 
     return bestChild;
@@ -196,15 +220,103 @@ int defaultPolicy(GameState state, int depth = 0) {
     while (!isTerminal(state, depth)) {
         if(state.AIturn) {
             std::vector<Action> possibleActionsAI = getPossibleActions(state);
-            Action actionAI = possibleActionsAI[rand() % possibleActionsAI.size()];
-            actions.push_back(std::make_pair(state.AIturn, actionAI));
-            state = getNewState(state, actionAI, state.AIturn);
 
+            Action actionTakenAI;
+            /*if(PathFinding::isSafe(state.players[1].getX(), state.players[1].getY(), state, state.players[1])) {
+                // for each possible action, check if it is safe
+                std::vector<Action> safepossibleActionsAI;
+                for (Action action : possibleActionsAI) {
+                    GameState newState = getNewState(state, action, state.AIturn);
+                    switch(action) {
+                        case MOVE_UP:
+                            if(PathFinding::isSafe(state.players[1].getX(), state.players[1].getY() - 1, newState, state.players[1])) {
+                                safepossibleActionsAI.push_back(action);
+                            }
+                            break;
+                        case MOVE_DOWN:
+                            if(PathFinding::isSafe(state.players[1].getX(), state.players[1].getY() + 1, newState, state.players[1])) {
+                                safepossibleActionsAI.push_back(action);
+                            }
+                            break;
+                        case MOVE_LEFT:
+                            if(PathFinding::isSafe(state.players[1].getX() - 1, state.players[1].getY(), newState, state.players[1])) {
+                                safepossibleActionsAI.push_back(action);
+                            }
+                            break;
+                        case MOVE_RIGHT:
+                            if(PathFinding::isSafe(state.players[1].getX() + 1, state.players[1].getY(), newState, state.players[1])) {
+                                safepossibleActionsAI.push_back(action);
+                            }
+                            break;
+                        default:
+                            safepossibleActionsAI.push_back(action);
+                            break;
+                    }
+                }
+
+                // If the AI is in a safe position, choose a random action
+                Action actionTakenAI = safepossibleActionsAI[rand() % safepossibleActionsAI.size()];                
+            } else {
+                std::vector<Action> path = PathFinding::findNearestSafePath(state.players[1].getX(), state.players[1].getY(), state, state.players[1]);
+                if(path.size() == 0) {
+                    actionTakenAI = NO_ACTION;
+                } else {
+                    actionTakenAI = path[0];
+                }
+            }*/
+            actionTakenAI = possibleActionsAI[rand() % possibleActionsAI.size()];
+
+            actions.push_back(std::make_pair(state.AIturn, actionTakenAI));
+            state = getNewState(state, actionTakenAI, state.AIturn);
             state.update();
         } else {
             std::vector<Action> possibleActionsPlayer = getPossibleActions(state);
 
-            Action actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
+            Action actionPlayer;
+            if (PathFinding::isSafe(state.players[0].getX(), state.players[0].getY(), state, state.players[0])) {
+                // for each possible action, check if it is safe
+                std::vector<Action> safepossibleActionsPlayer;
+                for (Action action : possibleActionsPlayer) {
+                    GameState newState = getNewState(state, action, state.AIturn);
+                    switch(action) {
+                        case MOVE_UP:
+                            if(PathFinding::isSafe(state.players[0].getX(), state.players[0].getY() - 1, newState, state.players[0])) {
+                                safepossibleActionsPlayer.push_back(action);
+                            }
+                            break;
+                        case MOVE_DOWN:
+                            if(PathFinding::isSafe(state.players[0].getX(), state.players[0].getY() + 1, newState, state.players[0])) {
+                                safepossibleActionsPlayer.push_back(action);
+                            }
+                            break;
+                        case MOVE_LEFT:
+                            if(PathFinding::isSafe(state.players[0].getX() - 1, state.players[0].getY(), newState, state.players[0])) {
+                                safepossibleActionsPlayer.push_back(action);
+                            }
+                            break;
+                        case MOVE_RIGHT:
+                            if(PathFinding::isSafe(state.players[0].getX() + 1, state.players[0].getY(), newState, state.players[0])) {
+                                safepossibleActionsPlayer.push_back(action);
+                            }
+                            break;
+                        default:
+                            safepossibleActionsPlayer.push_back(action);
+                            break;
+                    }
+                }
+
+                // If the player is in a safe position, choose a random action
+                actionPlayer = safepossibleActionsPlayer[rand() % safepossibleActionsPlayer.size()];
+            } else {
+                std::vector<Action> path = PathFinding::findNearestSafePath(state.players[0].getX(), state.players[0].getY(), state, state.players[0]);
+                if(path.size() == 0) {
+                    actionPlayer = NO_ACTION;
+                } else {
+                    actionPlayer = path[0];
+                }
+            }
+            // actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
+            
             actions.push_back(std::make_pair(state.AIturn, actionPlayer));
             state = getNewState(state, actionPlayer, state.AIturn);
         }
@@ -277,7 +389,7 @@ double calculateWinPercentage(Node* node) {
     if (node->visits == 0) {
         return 0.0;  // to avoid division by zero
     }
-    return static_cast<double>(node->wins) / static_cast<double>(node->visits);
+    return static_cast<double>(node->wins + node->visits) / static_cast<double>(2*node->visits);
 }
 
 Action MCTS::findBestAction(GameState& currentState) {
