@@ -14,50 +14,29 @@
 fast_log fast_lg;
 
 Node* bestChild(Node* node) {
-    // If node->state.AIturn, return a random child node
-    if (!node->state.AIturn) {
-        std::cout << "Returning the lowest winrate child" << std::endl;
-        double wr = 1000000000;
-        Node* bestChild = nullptr;
-        for (Node* child : node->children) {
-            double child_wr = (double)child->wins / child->visits;
-            if (child_wr < wr) {
-                wr = child_wr;
-                bestChild = child;
-            }
-        }
-        return bestChild;
-    }
-
-    // Return the child node with the highest or lowest value based on node->AIturn
-    double bestValue = node->state.AIturn ? -1000000000 : 1000000000;
+    // Return the child node with the highest value based on the UCB1 formula
+    double bestValue = -1000000000;
     Node* bestChild = nullptr;
-
-    std::cout << "AIturn: " << node->state.AIturn << std::endl;
 
     for (Node* child : node->children) {
         const float log_of_N = fast_lg.log(node->visits);
-        double value = (double)child->wins / child->visits + sqrt(2 * log_of_N / child->visits);
-
-        //std::cout << "Child: " << child->actionTaken << " Wins: " << child->wins << " Visits: " << child->visits << " Value: " << value << std::endl;
-
+        double value;
         if (node->state.AIturn) {
-            // If AIturn is true, find the child with the highest value
-            if (value > bestValue) {
-                bestValue = value;
-                bestChild = child;
-            }
+            value = (double)child->wins / child->visits + sqrt(2 * log_of_N / child->visits);
         } else {
-            // If AIturn is false, find the child with the lowest value
-            if (value < bestValue) {
-                bestValue = value;
-                bestChild = child;
-            }
+            value = (1.0 - (double)child->wins / child->visits) + sqrt(2 * log_of_N / child->visits);
+        }
+
+        if (value > bestValue) {
+            bestValue = value;
+            bestChild = child;
         }
     }
 
     if (bestChild == nullptr) {
         std::cout << "No best child, This might be an error" << std::endl;
+        // exit the program
+        exit(1);
     } else {
         //std::cout << "Best child: " << bestChild->actionTaken << " Wins: " << bestChild->wins << " Visits: " << bestChild->visits << std::endl;
     }
@@ -90,101 +69,48 @@ bool isTerminal(const GameState& state, int depth = 0) {
     return false;
 }
 
+bool canMoveInDirection(GameState& state, int playerId, int dx, int dy) {
+    // Check if the player can move in the given direction
+    if (state.level.isEmpty(state.players[playerId].getX() + dx, state.players[playerId].getY() + dy)) {
+        // check if there is a bomb at the position
+        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+            if (state.bombs[i].getX() == state.players[playerId].getX() + dx && state.bombs[i].getY() == state.players[playerId].getY() + dy) {
+                return false;
+            }
+        }
+        // check if there is a player at the position
+        for (const auto & player : state.players) {
+            if (player.getX() == state.players[playerId].getX() + dx && player.getY() == state.players[playerId].getY() + dy) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+
+}
+
 std::vector<Action> getPossibleActions(GameState& state) {
     std::vector<Action> possibleActions;
 
-    int playerId = 0;
+    int playerId = state.AIturn ? 1 : 0;
 
-    if (state.AIturn)
-        playerId = 1;
-
+    int bombSize = state.bombs.size();
     // Check if the player can move up
-    if (state.level.isEmpty(state.players[playerId].getX(), state.players[playerId].getY() - 1)) {
-        bool canPlay = true;
-
-        // check if there is a bomb at the position
-        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[playerId].getX() && state.bombs[i].getY() == state.players[playerId].getY() - 1) {
-                canPlay = false;
-                break;
-            }
-        }
-        // check if there is a player at the position
-        for (const auto & player : state.players) {
-            if (player.getX() == state.players[playerId].getX() && player.getY() == state.players[playerId].getY() - 1) {
-                canPlay = false;
-                break;
-            }
-        }
-        if (canPlay) {
-            possibleActions.push_back(MOVE_UP);
-        }
+    if (canMoveInDirection(state, playerId, 0, -1)) {
+        possibleActions.push_back(MOVE_UP);
     }
     // Check if the player can move down
-    if (state.level.isEmpty(state.players[playerId].getX(), state.players[playerId].getY() + 1)) {
-        bool canPlay = true;
-        
-        // check if there is a bomb at the position
-        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[playerId].getX() && state.bombs[i].getY() == state.players[playerId].getY() + 1) {
-                canPlay = false;
-                break;
-            }
-        }
-        // check if there is a player at the position
-        for (const auto & player : state.players) {
-            if (player.getX() == state.players[playerId].getX() && player.getY() == state.players[playerId].getY() + 1) {
-                canPlay = false;
-                break;
-            }
-        }
-        if (canPlay) {
-            possibleActions.push_back(MOVE_DOWN);
-        }
+    if (canMoveInDirection(state, playerId, 0, 1)) {
+        possibleActions.push_back(MOVE_DOWN);
     }
     // Check if the player can move left
-    if (state.level.isEmpty(state.players[playerId].getX() - 1, state.players[playerId].getY())) {
-        bool canPlay = true;
-        
-        // check if there is a bomb at the position
-        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[playerId].getX() - 1 && state.bombs[i].getY() == state.players[playerId].getY()) {
-                canPlay = false;
-                break;
-            }
-        }
-        // check if there is a player at the position
-        for (const auto & player : state.players) {
-            if (player.getX() == state.players[playerId].getX() - 1 && player.getY() == state.players[playerId].getY()) {
-                canPlay = false;
-                break;
-            }
-        }
-        if (canPlay) {
-            possibleActions.push_back(MOVE_LEFT);
-        }
+    if (canMoveInDirection(state, playerId, -1, 0)) {
+        possibleActions.push_back(MOVE_LEFT);
     }
     // Check if the player can move right
-    if (state.level.isEmpty(state.players[playerId].getX() + 1, state.players[playerId].getY())) {
-        bool canPlay = true;
-        
-        // check if there is a bomb at the position
-        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
-            if (state.bombs[i].getX() == state.players[playerId].getX() + 1 && state.bombs[i].getY() == state.players[playerId].getY()) {
-                canPlay = false;
-                break;
-            }
-        }
-        // check if there is a player at the position
-        for (const auto & player : state.players) {
-            if (player.getX() == state.players[playerId].getX() + 1 && player.getY() == state.players[playerId].getY()) {
-                canPlay = false;
-                break;
-            }
-        }
-        if (canPlay) {
-            possibleActions.push_back(MOVE_RIGHT);
-        }
+    if (canMoveInDirection(state, playerId, 1, 0)) {
+        possibleActions.push_back(MOVE_RIGHT);
     }
 
     // Add other possible actions here
@@ -200,125 +126,34 @@ bool isFullyExpanded(Node* node) {
     return node->children.size() == getPossibleActions(node->state).size();
 }
 
-GameState getNewState(const GameState& state, Action action, bool AIturn) {
+void getNewState(GameState& state, Action action, bool AIturn) {
     // Get the new game state resulting from taking the action
-    GameState newState = state;
 
     if (AIturn) {
-        newState.players[1].play(action, newState);
+        state.players[1].play(action, state);
     } else {
-        newState.players[0].play(action, newState);
-        newState.AIturn = true;
+        state.players[0].play(action, state);
+        state.AIturn = true;
     }
-
-    return newState;
 }
 
 int defaultPolicy(GameState state, int depth = 0) {
     // Simulate a random game and return the result
-    std::vector<std::pair<int, Action>> actions;
     while (!isTerminal(state, depth)) {
         if(state.AIturn) {
             std::vector<Action> possibleActionsAI = getPossibleActions(state);
 
-            Action actionTakenAI;
-            /*if(PathFinding::isSafe(state.players[1].getX(), state.players[1].getY(), state, state.players[1])) {
-                // for each possible action, check if it is safe
-                std::vector<Action> safepossibleActionsAI;
-                for (Action action : possibleActionsAI) {
-                    GameState newState = getNewState(state, action, state.AIturn);
-                    switch(action) {
-                        case MOVE_UP:
-                            if(PathFinding::isSafe(state.players[1].getX(), state.players[1].getY() - 1, newState, state.players[1])) {
-                                safepossibleActionsAI.push_back(action);
-                            }
-                            break;
-                        case MOVE_DOWN:
-                            if(PathFinding::isSafe(state.players[1].getX(), state.players[1].getY() + 1, newState, state.players[1])) {
-                                safepossibleActionsAI.push_back(action);
-                            }
-                            break;
-                        case MOVE_LEFT:
-                            if(PathFinding::isSafe(state.players[1].getX() - 1, state.players[1].getY(), newState, state.players[1])) {
-                                safepossibleActionsAI.push_back(action);
-                            }
-                            break;
-                        case MOVE_RIGHT:
-                            if(PathFinding::isSafe(state.players[1].getX() + 1, state.players[1].getY(), newState, state.players[1])) {
-                                safepossibleActionsAI.push_back(action);
-                            }
-                            break;
-                        default:
-                            safepossibleActionsAI.push_back(action);
-                            break;
-                    }
-                }
+            Action actionTakenAI = possibleActionsAI[rand() % possibleActionsAI.size()];
 
-                // If the AI is in a safe position, choose a random action
-                Action actionTakenAI = safepossibleActionsAI[rand() % safepossibleActionsAI.size()];                
-            } else {
-                std::vector<Action> path = PathFinding::findNearestSafePath(state.players[1].getX(), state.players[1].getY(), state, state.players[1]);
-                if(path.size() == 0) {
-                    actionTakenAI = NO_ACTION;
-                } else {
-                    actionTakenAI = path[0];
-                }
-            }*/
-            actionTakenAI = possibleActionsAI[rand() % possibleActionsAI.size()];
-
-            actions.push_back(std::make_pair(state.AIturn, actionTakenAI));
-            state = getNewState(state, actionTakenAI, state.AIturn);
+            getNewState(state, actionTakenAI, state.AIturn);
+            // Update the board after the AI has played
             state.update();
         } else {
             std::vector<Action> possibleActionsPlayer = getPossibleActions(state);
 
-            Action actionPlayer;
-            if (PathFinding::isSafe(state.players[0].getX(), state.players[0].getY(), state, state.players[0])) {
-                // for each possible action, check if it is safe
-                std::vector<Action> safepossibleActionsPlayer;
-                for (Action action : possibleActionsPlayer) {
-                    GameState newState = getNewState(state, action, state.AIturn);
-                    switch(action) {
-                        case MOVE_UP:
-                            if(PathFinding::isSafe(state.players[0].getX(), state.players[0].getY() - 1, newState, state.players[0])) {
-                                safepossibleActionsPlayer.push_back(action);
-                            }
-                            break;
-                        case MOVE_DOWN:
-                            if(PathFinding::isSafe(state.players[0].getX(), state.players[0].getY() + 1, newState, state.players[0])) {
-                                safepossibleActionsPlayer.push_back(action);
-                            }
-                            break;
-                        case MOVE_LEFT:
-                            if(PathFinding::isSafe(state.players[0].getX() - 1, state.players[0].getY(), newState, state.players[0])) {
-                                safepossibleActionsPlayer.push_back(action);
-                            }
-                            break;
-                        case MOVE_RIGHT:
-                            if(PathFinding::isSafe(state.players[0].getX() + 1, state.players[0].getY(), newState, state.players[0])) {
-                                safepossibleActionsPlayer.push_back(action);
-                            }
-                            break;
-                        default:
-                            safepossibleActionsPlayer.push_back(action);
-                            break;
-                    }
-                }
-
-                // If the player is in a safe position, choose a random action
-                actionPlayer = safepossibleActionsPlayer[rand() % safepossibleActionsPlayer.size()];
-            } else {
-                std::vector<Action> path = PathFinding::findNearestSafePath(state.players[0].getX(), state.players[0].getY(), state, state.players[0]);
-                if(path.size() == 0) {
-                    actionPlayer = NO_ACTION;
-                } else {
-                    actionPlayer = path[0];
-                }
-            }
-            // actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
+            Action actionPlayer = possibleActionsPlayer[rand() % possibleActionsPlayer.size()];
             
-            actions.push_back(std::make_pair(state.AIturn, actionPlayer));
-            state = getNewState(state, actionPlayer, state.AIturn);
+            getNewState(state, actionPlayer, state.AIturn);
         }
     }
 
@@ -351,9 +186,13 @@ Node* expand(Node* node) {
     // Choose a random action from the remaining actions
     Action action = possibleActions[rand() % possibleActions.size()];
 
-    GameState newState = getNewState(node->state, action, node->state.AIturn);
+    bool AIturn = node->state.AIturn;
+
+    GameState newState = node->state;
+
+    getNewState(newState, action, node->state.AIturn);
     // If the AI is playing, update the board
-    if(node->state.AIturn) {
+    if (AIturn) {
         newState.update();
     }
     Node* newNode = new Node(newState, action, node, true);    
@@ -392,8 +231,10 @@ double calculateWinPercentage(Node* node) {
     return static_cast<double>(node->wins + node->visits) / static_cast<double>(2*node->visits);
 }
 
-Action MCTS::findBestAction(GameState& currentState) {
-    Node* root = new Node(currentState, NO_ACTION, nullptr, true);
+Action MCTS::findBestAction() {
+    // print the current state
+    std::cout << "Current state: " << root->state.turns << std::endl;
+    std::cout << "AIturn: " << root->state.AIturn << std::endl;
 
     for (int i = 0; i < NUM_SIMULATIONS; ++i) {
         Node* node = treePolicy(root);
@@ -413,4 +254,26 @@ Action MCTS::findBestAction(GameState& currentState) {
     std::cout << "Winning percentage: " << calculateWinPercentage(bestChildNode)*100 << std::endl;
 
     return bestChildNode->actionTaken;
+}
+
+void MCTS::init(GameState& currentState) {
+    root = new Node(currentState, NO_ACTION, nullptr, true);
+}
+
+void MCTS::nextSimulation(Action action) {
+    if (root == nullptr) {
+        return;
+    }
+    // Find the child node with the given action
+    for (Node* child : root->children) {
+        if (child->actionTaken == action) {
+            root = child;
+            root->parent = nullptr;
+            return;
+        }
+    }
+
+    // If the child node is not found
+    std::cout << "This action is not possible, something went wrong" << std::endl;
+    exit(1);
 }

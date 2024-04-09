@@ -5,6 +5,7 @@
 #include <iostream>
 #include <optional>
 #include "GameState.h"
+#include "MCTS.h"
 
 #define TILE_SIZE 64
 #define MAX_WINDOW_X 30
@@ -23,6 +24,9 @@ private:
 
     // GameState
     GameState gameState;
+
+    // MCTS
+    MCTS mcts;
 
     float zoom;
 

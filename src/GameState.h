@@ -4,8 +4,6 @@
 #include "Level.h"
 #include "Player.h"
 #include "Bomb.h"
-#include "Bonus.h"
-#include "Flame.h"
 
 enum Winner
 {
@@ -26,8 +24,7 @@ public:
     std::vector<Player> players;
     bool AIturn;
     std::vector<Bomb> bombs;
-    std::vector<Bonus> bonuses;
-    std::vector<Flame> flames;
+    std::vector<std::vector<int>> flames;
 
     Winner winner;
     int turns;

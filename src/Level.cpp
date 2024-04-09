@@ -83,6 +83,22 @@ void Level::draw(sf::RenderWindow &window, int zoom) {
     sf::Sprite voidsprite;
     voidsprite.scale(1.0/zoom, 1.0/zoom);
     voidsprite.setTexture(Voidtexture);
+    
+    sf::Texture bonus0texture;
+    if (!bonus0texture.loadFromFile("assets/img/bonus/0.png")) {
+        // handle error
+    }
+    sf::Sprite bonus0sprite;
+    bonus0sprite.scale(1.0/zoom, 1.0/zoom);
+    bonus0sprite.setTexture(bonus0texture);
+
+    sf::Texture bonus1texture;
+    if (!bonus1texture.loadFromFile("assets/img/bonus/1.png")) {
+        // handle error
+    }
+    sf::Sprite bonus1sprite;
+    bonus1sprite.scale(1.0/zoom, 1.0/zoom);
+    bonus1sprite.setTexture(bonus1texture);
 
     for (long unsigned i = 0; i < levelData.size(); ++i) {
         for (long unsigned j = 0; j < levelData[i].size(); ++j) {
@@ -98,6 +114,28 @@ void Level::draw(sf::RenderWindow &window, int zoom) {
                     i * wall2texture.getSize().y/zoom
                 );
                 window.draw(wall2sprite);
+            } else if (levelData[i][j] == '0') {
+                voidsprite.setPosition(
+                    j * Voidtexture.getSize().x/zoom,
+                    i * Voidtexture.getSize().y/zoom
+                );
+                window.draw(voidsprite);
+                bonus0sprite.setPosition(
+                    j * bonus0texture.getSize().x/zoom,
+                    i * bonus0texture.getSize().y/zoom
+                );
+                window.draw(bonus0sprite);
+            } else if (levelData[i][j] == '1') {
+                voidsprite.setPosition(
+                    j * Voidtexture.getSize().x/zoom,
+                    i * Voidtexture.getSize().y/zoom
+                );
+                window.draw(voidsprite);
+                bonus1sprite.setPosition(
+                    j * bonus1texture.getSize().x/zoom,
+                    i * bonus1texture.getSize().y/zoom
+                );
+                window.draw(bonus1sprite);
             } else {
                 voidsprite.setPosition(
                     j * Voidtexture.getSize().x/zoom,
@@ -143,4 +181,26 @@ bool Level::isundestroyWall(int x, int y) {
 
 void Level::destroyWall(int x, int y) {
     levelData[y][x] = ' ';
+}
+
+void Level::addBonus(int x, int y, BonusType type) {
+    levelData[y][x] = std::to_string(type)[0];
+}
+
+int Level::isBonus(int x, int y) {
+    if(levelData[y][x] == '0') {
+        return 0;
+    }
+    if(levelData[y][x] == '1') {
+        return 1;
+    }
+    return -1;
+}
+
+void Level::removeBonus(int x, int y) {
+    levelData[y][x] = ' ';
+}
+
+BonusType Level::getRandomType() {
+    return static_cast<BonusType>(rand() % 2);
 }

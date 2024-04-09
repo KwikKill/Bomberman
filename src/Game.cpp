@@ -4,9 +4,9 @@
 #include "Game.h"
 #include "Player.h"
 #include "Bomb.h"
-#include "Bonus.h"
 #include "HUD.h"
 #include "GameState.h"
+#include "Flame.h"
 #include <optional>
 #include <algorithm>
 
@@ -37,7 +37,8 @@ void Game::load(unsigned int level_nb) {
 
     // Randomly choose a spawn position for the player
     std::vector<std::pair<int, int>> spawnPositions = gameState.level.getSpawnPositions();
-    int randomIndex = rand() % spawnPositions.size();
+    int SpawnPositionsSize = spawnPositions.size();
+    int randomIndex = rand() % SpawnPositionsSize;
 
     // Create the players and set their positions
     gameState.players.push_back(Player(
@@ -51,14 +52,24 @@ void Game::load(unsigned int level_nb) {
     ));
     gameState.players.push_back(Player(
         1,
-        spawnPositions[(randomIndex + 1) % spawnPositions.size()].first,
-        spawnPositions[(randomIndex + 1) % spawnPositions.size()].second,
+        spawnPositions[(randomIndex + 1) % SpawnPositionsSize].first,
+        spawnPositions[(randomIndex + 1) % SpawnPositionsSize].second,
         DEFAULT_PLAYER_SPEED,
         "assets/img/ai.png",
         AI,
         zoom
     ));
     gameState.bombs = bombs;
+
+    // init flames
+    for (int i = 0; i < gameState.level.getHeight(); ++i) {
+        std::vector<int> row;
+        for (int j = 0; j < gameState.level.getWidth(); ++j) {
+            row.push_back(0);
+        }
+        gameState.flames.push_back(row);
+    }
+
 }
 
 void Game::run()
@@ -73,6 +84,9 @@ void Game::run()
 
             render();
             if (gameState.AIturn) {
+                if (mcts.isInitialized() == false) {
+                    mcts.init(gameState);
+                }
                 update();
             }
 
@@ -88,7 +102,6 @@ void Game::run()
             }
             window.close();
         }
-            window.display(); // End the current frame and display everything
     }
 }
 
@@ -102,20 +115,45 @@ void Game::processEvents()
         else if (event.type == sf::Event::KeyPressed) {
             // print player strength and number of bombs
             if (event.key.code == sf::Keyboard::Up) {
-                gameState.players[0].play(MOVE_UP, gameState);
+                bool played = gameState.players[0].play(MOVE_UP, gameState);
                 gameState.AIturn = true;
+                if (played) {
+                    mcts.nextSimulation(MOVE_UP);
+                } else {
+                    mcts.nextSimulation(NO_ACTION);
+                }
             } else if (event.key.code == sf::Keyboard::Down) {
-                gameState.players[0].play(MOVE_DOWN, gameState);
+                bool played = gameState.players[0].play(MOVE_DOWN, gameState);
                 gameState.AIturn = true;
+                if (played) {
+                    mcts.nextSimulation(MOVE_DOWN);
+                } else {
+                    mcts.nextSimulation(NO_ACTION);
+                }
             } else if (event.key.code == sf::Keyboard::Left) {
-                gameState.players[0].play(MOVE_LEFT, gameState);
+                bool played = gameState.players[0].play(MOVE_LEFT, gameState);
                 gameState.AIturn = true;
+                if (played) {
+                    mcts.nextSimulation(MOVE_LEFT);
+                } else {
+                    mcts.nextSimulation(NO_ACTION);
+                }
             } else if (event.key.code == sf::Keyboard::Right) {
-                gameState.players[0].play(MOVE_RIGHT, gameState);
+                bool played = gameState.players[0].play(MOVE_RIGHT, gameState);
                 gameState.AIturn = true;
+                if (played) {
+                    mcts.nextSimulation(MOVE_RIGHT);
+                } else {
+                    mcts.nextSimulation(NO_ACTION);
+                }
             } else if (event.key.code == sf::Keyboard::Space) {
-                gameState.players[0].play(PLACE_BOMB, gameState);
+                bool played = gameState.players[0].play(PLACE_BOMB, gameState);
                 gameState.AIturn = true;
+                if (played) {
+                    mcts.nextSimulation(PLACE_BOMB);
+                } else {
+                    mcts.nextSimulation(NO_ACTION);
+                }
             }
         }
     }
@@ -124,8 +162,15 @@ void Game::processEvents()
 void Game::update()
 {
     // Update the players
-    for (int i = 0; i < gameState.players.size(); ++i) {
-        gameState.players[i].update(gameState);
+    int playerSize = gameState.players.size();
+    for (int i = 0; i < playerSize; ++i) {
+        if (gameState.players[i].getType() == AI) {
+            std::cout << "Finding best action..." << std::endl;
+            Action action = mcts.findBestAction();
+            std::cout << "Action: " << action << std::endl;
+            gameState.players[i].play(action, gameState);
+            mcts.nextSimulation(action);
+        }
     }
 
     // Update the game state
@@ -138,23 +183,24 @@ void Game::render()
     gameState.level.draw(window, zoom);
     
     // Draw the players
-    for (int i = 0; i < gameState.players.size(); ++i) {
+    int playerSize = gameState.players.size();
+    for (int i = 0; i < playerSize; ++i) {
         gameState.players[i].draw(window, zoom);
     }
 
-    // Draw the bonuses
-    for (long unsigned i = 0; i < gameState.bonuses.size(); ++i) {
-        gameState.bonuses[i].draw(window, zoom);
-    }
-
     // Draw the bombs
-    for (long unsigned i = 0; i < gameState.bombs.size(); ++i) {
+    int bombSize = gameState.bombs.size();
+    for (long unsigned i = 0; i < bombSize; ++i) {
         gameState.bombs[i].draw(window, zoom);
     }
 
     // Draw the flames
     for (long unsigned i = 0; i < gameState.flames.size(); ++i) {
-        gameState.flames[i].draw(window, zoom);
+        for (long unsigned j = 0; j < gameState.flames[i].size(); ++j) {
+            if (gameState.flames[i][j] == 1) {
+                Flame::draw(j, i, window, zoom);
+            }
+        }
     }
 
     // Draw the HUD

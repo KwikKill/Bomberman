@@ -9,6 +9,13 @@
 class Bomb;
 class GameState;
 
+enum BonusType
+{
+    STRENGTH,
+    NUMBOMB,
+};
+
+
 class Level {
 private:
     std::vector<std::string> levelData;
@@ -26,6 +33,11 @@ public:
     bool isDestroyable(int x, int y);
     bool isundestroyWall(int x, int y);
     void destroyWall(int x, int y);
+
+    void addBonus(int x, int y, BonusType type);
+    void removeBonus(int x, int y);
+    int isBonus(int x, int y);
+    BonusType getRandomType();
 
     size_t getWidth() const { return width; }
     size_t getHeight() const { return height; }

@@ -1,18 +1,13 @@
 #include "Flame.h"
 #include "Game.h"
 
-Flame::Flame(int x, int y) {
-    this->x = x;
-    this->y = y;
-    time_left = DEFAULT_FLAME_TIMER;
-
+void Flame::draw(int x, int y, sf::RenderWindow &window, int zoom) {
+    sf::Texture texture;
     if (!texture.loadFromFile("assets/img/flame.png")) {
         // handle error
     }
-    sprite.setTexture(texture);
-}
+    sf::Sprite sprite;
 
-void Flame::draw(sf::RenderWindow &window, int zoom) {
     sprite.setScale(1.0/zoom, 1.0/zoom);
     sprite.setTexture(texture);
     sprite.setPosition(
@@ -20,8 +15,4 @@ void Flame::draw(sf::RenderWindow &window, int zoom) {
         (y * TILE_SIZE)/zoom
     );
     window.draw(sprite);
-}
-
-void Flame::update() {
-    time_left--;
 }

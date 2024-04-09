@@ -46,9 +46,7 @@ private:
 public:
     Player(int id, int x, int y, int speed, std::string texturePath, PlayerType type, int zoom);
     void draw(sf::RenderWindow &window, int zoom);
-    void play(Action action, GameState &state);
-
-    void update(GameState &gamestate);
+    bool play(Action action, GameState &state);
 
     void die();
     bool dropBomb();
@@ -63,6 +61,8 @@ public:
 
     bool isAlive() const { return alive; }
     bool isLegalMove(int x, int y, GameState &state);
+
+    PlayerType getType() const { return type; }
 };
 
 #endif // PLAYER_P

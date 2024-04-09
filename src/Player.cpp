@@ -37,28 +37,32 @@ void Player::move(int dx, int dy) {
     y += dy * speed;
 }
 
-void Player::play(Action action, GameState &state) {
+bool Player::play(Action action, GameState &state) {
         switch (action) {
         case MOVE_UP:
             if(isLegalMove(x, y-1, state)) {
                 move(0, -1);
+                return true;
             }
-            break;
+            return false;
         case MOVE_DOWN:
             if(isLegalMove(x, y+1, state)) {
                 move(0, 1);
+                return true;
             }
-            break;
+            return false;
         case MOVE_LEFT:
             if(isLegalMove(x-1, y, state)) {
                 move(-1, 0);
+                return true;
             }
-            break;
+            return false;
         case MOVE_RIGHT:
             if(isLegalMove(x+1, y, state)) {
                 move(1, 0);
+                return true;
             }
-            break;
+            return false;
         case PLACE_BOMB:
             if (dropBomb()) {
                 state.bombs.push_back(
@@ -70,33 +74,14 @@ void Player::play(Action action, GameState &state) {
                         id
                     )
                 );
+                return true;
             }
-            break;
+            return false;
         default:
-            break;
+            return false;
     }
+    return true;
 
-}
-
-void Player::update(GameState &gamestate) {
-    if (type == AI) {
-        /*if(!PathFinding::isSafe(x, y, game, *this)) {
-            std::vector<std::pair<int, int>> path = PathFinding::findNearestSafePath(x, y, game, *this);
-            
-            if (path.size() > 0) {
-                std::pair<int, int> nextMove = path[0];
-                
-                // move uses the difference between the current position and the next position
-                move(nextMove.first-x, nextMove.second-y);
-            }
-        }*/
-        MCTS mtcs = MCTS();
-        std::cout << "Finding best action..." << std::endl;
-        Action action = mtcs.findBestAction(gamestate);
-        std::cout << "Action: " << action << std::endl;
-        play(action, gamestate);
-        exit(0);
-    }
 }
 
 bool Player::dropBomb() {

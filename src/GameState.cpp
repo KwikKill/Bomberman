@@ -2,11 +2,10 @@
 #include <iostream>
 
 void GameState::PlayerCheckBonus(Player &player) {
-    for (long unsigned i = 0; i < bonuses.size(); ++i) {
-        if (player.getX() == bonuses[i].getX() && player.getY() == bonuses[i].getY()) {
-            player.addBonus(bonuses[i].getType());
-            bonuses.erase(bonuses.begin() + i);
-        }
+    int bonus = level.isBonus(player.getX(), player.getY());
+    if (bonus != -1) {
+        player.addBonus(bonus);
+        level.removeBonus(player.getX(), player.getY());
     }
 }
 
@@ -15,12 +14,24 @@ void GameState::update()
     //std::cout << "Turn " << turns << std::endl;
 
     // Update the players
-    for (int i = 0; i < players.size(); ++i) {
+    for (int i = 0; i < 2; ++i) {
         PlayerCheckBonus(players[i]);
     }
+
+    //std::cout << "AAAAA " << std::endl;
+
+    // Reset the flames
+    for (long unsigned i = 0; i < flames.size(); ++i) {
+        for (long unsigned j = 0; j < flames[i].size(); ++j) {
+            flames[i][j] = 0;
+        }
+    }
+
+    //std::cout << "BBBBB " << std::endl;
     
     // Update the bombs
-    for (int i = bombs.size() - 1; i >= 0; --i) {
+    int bombSize = bombs.size();
+    for (int i = bombSize - 1; i >= 0; --i) {
         //std::cout << "bomb " << i << " time left: " << bombs[i].getTimeLeft() << std::endl;
         if(bombs[i].getTimeLeft() > 0) {
             bombs[i].update();
@@ -30,10 +41,9 @@ void GameState::update()
             std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(*this);
 
             // Add the flames to the list of flames
-            for (long unsigned j = 0; j < flamePositions.size(); ++j) {
-                flames.push_back(
-                    Flame(flamePositions[j].first, flamePositions[j].second)
-                );
+            int flamePosistionSize = flamePositions.size();
+            for (long unsigned j = 0; j < flamePosistionSize; ++j) {
+                flames[flamePositions[j].second][flamePositions[j].first] = 1;
             }
             // add a bomb to the player
             std::optional<int> owner = bombs[i].getOwner();
@@ -44,44 +54,35 @@ void GameState::update()
             bombs.erase(bombs.begin() + i);
         }
     }
-    
+
+    //std::cout << "CCCCC " << std::endl;
+
     // Recursively explode the bombs
     bool explosion = true;
     while (explosion) {
         explosion = false;
-        for (int i = bombs.size() - 1; i >= 0; --i) {
-            // if the bomb is on a flame, explode it
-            for (long unsigned j = 0; j < flames.size(); ++j) {
-                if (bombs[i].getX() == flames[j].getX() && bombs[i].getY() == flames[j].getY()) {
-                    std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(*this);
-                    for (long unsigned j = 0; j < flamePositions.size(); ++j) {
-                        flames.push_back(
-                            Flame(flamePositions[j].first, flamePositions[j].second)
-                        );
-                    }
-                    std::optional<int> owner = bombs[i].getOwner();
-                    if (owner.has_value()) {
-                        players[owner.value()].addBomb();
-                    }
-                    bombs.erase(bombs.begin() + i);
-                    explosion = true;
-                    break;
+        int bombSize = bombs.size();
+        for (int i = bombSize - 1; i >= 0; --i) {
+            if (flames[bombs[i].getY()][bombs[i].getX()] == 1) {
+                std::vector<std::pair<int, int>> flamePositions = bombs[i].explode(*this);
+                int flamePosistionSize = flamePositions.size();
+                for (long unsigned j = 0; j < flamePosistionSize; ++j) {
+                    flames[flamePositions[j].second][flamePositions[j].first] = 1;
                 }
+                std::optional<int> owner = bombs[i].getOwner();
+                if (owner.has_value()) {
+                    players[owner.value()].addBomb();
+                }
+                bombs.erase(bombs.begin() + i);
+                explosion = true;
             }
         }
     }
 
-    // Update the flames
-    for (int i = flames.size() -1; i >= 0; --i) {
-        if (flames[i].getTimeLeft() > 0) {
-            flames[i].update();
-        } else {
-            flames.erase(flames.begin() + i);
-        }
-    }
+    //std::cout << "DDDDD " << std::endl;
 
     int numAlive = 0;
-    for (int i = 0; i < players.size(); ++i) {
+    for (int i = 0; i < 2; ++i) {
         if (players[i].isAlive()) {
             numAlive++;
         }

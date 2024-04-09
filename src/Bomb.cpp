@@ -1,6 +1,5 @@
 #include "Bomb.h"
 #include "Game.h"
-#include "Bonus.h"
 
 std::vector<std::string> *Bomb::bombTextures = new std::vector<std::string> {
     "assets/img/bomb1.png",
@@ -57,7 +56,8 @@ std::vector<std::pair<int, int>> Bomb::explode(GameState &state) {
     flamePositions.emplace_back(x, y);
 
     // Check if the bomb is in the same position as a player
-    for (int i = 0; i < state.players.size(); ++i) {
+    int playerSize = state.players.size();
+    for (int i = 0; i < playerSize; ++i) {
         if (state.players[i].getX() == x && state.players[i].getY() == y) {
             state.players[i].die();
         }
@@ -85,15 +85,15 @@ std::vector<std::pair<int, int>> Bomb::explode(GameState &state) {
                 state.level.destroyWall(new_x, new_y);
                 if (rand() % 100 < BONUS_SPAWN_CHANCE) {
                     //std::cout << "Bonus " << new_x << " " << new_y << std::endl;
-                    state.bonuses.push_back(
-                        Bonus(new_x, new_y, Bonus::getRandomType())
+                    state.level.addBonus(
+                        new_x, new_y, state.level.getRandomType()
                     );
                     //std::cout << "Bonus : " << bonuses.size() << std::endl;
                 }
                 flamePositions.emplace_back(new_x, new_y);
                 break;
             } else {
-                for (int k = 0; k < state.players.size(); ++k) {
+                for (int k = 0; k < playerSize; ++k) {
                     if (state.players[k].getX() == new_x && state.players[k].getY() == new_y) {
                         state.players[k].die();
                     }

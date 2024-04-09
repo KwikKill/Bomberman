@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include "Level.h"
 #include "Player.h"
-#include "Bonus.h"
 #include <optional>
 
 #define DEFAULT_BOMB_TIMER 3
