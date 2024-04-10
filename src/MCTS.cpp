@@ -73,7 +73,8 @@ bool canMoveInDirection(GameState& state, int playerId, int dx, int dy) {
     // Check if the player can move in the given direction
     if (state.level.isEmpty(state.players[playerId].getX() + dx, state.players[playerId].getY() + dy)) {
         // check if there is a bomb at the position
-        for (long unsigned i = 0; i < state.bombs.size(); ++i) {
+        int bombSize = state.bombs.size();
+        for (long unsigned i = 0; i < bombSize; ++i) {
             if (state.bombs[i].getX() == state.players[playerId].getX() + dx && state.bombs[i].getY() == state.players[playerId].getY() + dy) {
                 return false;
             }
@@ -92,10 +93,11 @@ bool canMoveInDirection(GameState& state, int playerId, int dx, int dy) {
 
 std::vector<Action> getPossibleActions(GameState& state) {
     std::vector<Action> possibleActions;
+    // Reserve space for the maximum number of possible actions
+    possibleActions.reserve(6);
 
     int playerId = state.AIturn ? 1 : 0;
 
-    int bombSize = state.bombs.size();
     // Check if the player can move up
     if (canMoveInDirection(state, playerId, 0, -1)) {
         possibleActions.push_back(MOVE_UP);
@@ -123,7 +125,13 @@ std::vector<Action> getPossibleActions(GameState& state) {
 
 bool isFullyExpanded(Node* node) {
     // Check if all possible actions have been tried
-    return node->children.size() == getPossibleActions(node->state).size();
+    if(node->isFullyExpanded) {
+        return true;
+    } else if (node->children.size() == getPossibleActions(node->state).size()) {
+        node->isFullyExpanded = true;
+        return true;
+    }
+    return false;
 }
 
 void getNewState(GameState& state, Action action, bool AIturn) {
@@ -195,7 +203,7 @@ Node* expand(Node* node) {
     if (AIturn) {
         newState.update();
     }
-    Node* newNode = new Node(newState, action, node, true);    
+    Node* newNode = new Node(action, newState, node);    
 
     // Add the new node to the children of the current node
     node->children.push_back(newNode);
@@ -257,7 +265,7 @@ Action MCTS::findBestAction() {
 }
 
 void MCTS::init(GameState& currentState) {
-    root = new Node(currentState, NO_ACTION, nullptr, true);
+    root = new Node(currentState, NO_ACTION, nullptr);
 }
 
 void MCTS::nextSimulation(Action action) {
@@ -274,6 +282,8 @@ void MCTS::nextSimulation(Action action) {
     }
 
     // If the child node is not found
-    std::cout << "This action is not possible, something went wrong" << std::endl;
+    std::cout << "This action seems to be umpossible, please take a closer look" << std::endl;
+    std::cout << "Action: " << action << std::endl;
+    log_tree(root);
     exit(1);
 }

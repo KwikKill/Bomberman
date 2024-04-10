@@ -51,6 +51,7 @@ void Bomb::update() {
 
 std::vector<std::pair<int, int>> Bomb::explode(GameState &state) {
     std::vector<std::pair<int, int>> flamePositions;
+    flamePositions.reserve(4 * strength + 1);
 
     // Add flame position for the bomb itself
     flamePositions.emplace_back(x, y);
