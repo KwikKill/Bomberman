@@ -71,17 +71,19 @@ bool isTerminal(const GameState& state, int depth = 0) {
 
 bool canMoveInDirection(GameState& state, int playerId, int dx, int dy) {
     // Check if the player can move in the given direction
-    if (state.level.isEmpty(state.players[playerId].getX() + dx, state.players[playerId].getY() + dy)) {
+    int new_x = state.players[playerId].getX() + dx;
+    int new_y = state.players[playerId].getY() + dy;
+    if (state.level.isEmpty(new_x, new_y)) {
         // check if there is a bomb at the position
         int bombSize = state.bombs.size();
         for (long unsigned i = 0; i < bombSize; ++i) {
-            if (state.bombs[i].getX() == state.players[playerId].getX() + dx && state.bombs[i].getY() == state.players[playerId].getY() + dy) {
+            if (state.bombs[i].getX() == new_x && state.bombs[i].getY() == new_y) {
                 return false;
             }
         }
         // check if there is a player at the position
         for (const auto & player : state.players) {
-            if (player.getX() == state.players[playerId].getX() + dx && player.getY() == state.players[playerId].getY() + dy) {
+            if (player.getX() == new_x && player.getY() == new_y) {
                 return false;
             }
         }
