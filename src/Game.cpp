@@ -1,5 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <optional>
+#include <algorithm>
+#include <chrono>
+
 #include "Level.h"
 #include "Game.h"
 #include "Player.h"
@@ -7,8 +11,6 @@
 #include "HUD.h"
 #include "GameState.h"
 #include "Flame.h"
-#include <optional>
-#include <algorithm>
 
 void Game::load(unsigned int level_nb) {
     // Create a new level
@@ -165,11 +167,17 @@ void Game::update()
     int playerSize = gameState.players.size();
     for (int i = 0; i < playerSize; ++i) {
         if (gameState.players[i].getType() == AI) {
+            auto start = std::chrono::high_resolution_clock::now();
+
             std::cout << "Finding best action..." << std::endl;
             Action action = mcts.findBestAction();
             std::cout << "Action: " << action << std::endl;
             gameState.players[i].play(action, gameState);
             mcts.nextSimulation(action);
+
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsed = end - start;
+            std::cout << "Time taken: " << elapsed.count() << "s" << std::endl;
         }
     }
 

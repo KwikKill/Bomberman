@@ -10,6 +10,7 @@
 #include <utility>
 #include <thread>
 #include <mutex>
+#include <fstream>
 
 fast_log fast_lg;
 
@@ -224,13 +225,13 @@ Node* treePolicy(Node* node) {
     return node;
 }
 
-void log_tree(Node* node, int depth = 0) {
+void log_tree(Node* node, int depth = 0, std::ostream& output = std::cout) {
     for (int i = 0; i < depth; ++i) {
-        std::cout << "  ";
+        output << "  ";
     }
-    std::cout << "Action: " << node->actionTaken << " By " << !node->state.AIturn << " Wins: " << node->wins << " Visits: " << node->visits << std::endl;
+    output << "Action: " << node->actionTaken << " By " << !node->state.AIturn << " Wins: " << node->wins << " Visits: " << node->visits << std::endl;
     for (Node* child : node->children) {
-        log_tree(child, depth + 1);
+        log_tree(child, depth + 1, output);
     }
 }
 
@@ -257,7 +258,7 @@ Action MCTS::findBestAction() {
         return NO_ACTION;
     }
 
-    log_tree(root);
+    log_tree(root, 0);
     
     Node* bestChildNode = bestChild(root);
     // Write what the AI thinks is the it's winning percentage
