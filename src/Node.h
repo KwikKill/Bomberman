@@ -18,6 +18,11 @@ public:
 
     Node(Action actionTaken, GameState& state, Node* parent)
         : state(state), actionTaken(actionTaken), parent(parent), wins(0), visits(0), isFullyExpanded(false) {}
+    ~Node() {
+        for (Node* child : children) {
+            delete child;
+        }
+    }
 };
 
 #endif

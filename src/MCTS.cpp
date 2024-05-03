@@ -279,10 +279,22 @@ void MCTS::nextSimulation(Action action) {
     for (Node* child : root->children) {
         if (child->actionTaken == action) {
             root = child;
+            // Remove this node from his parent children
+            root->parent->children.erase(
+                std::remove(
+                    root->parent->children.begin(),
+                    root->parent->children.end(),
+                    root
+                ),
+                root->parent->children.end()
+            );
+            // Delete the current node and its children
+            delete root->parent;
             root->parent = nullptr;
             return;
         }
     }
+    
 
     // If the child node is not found
     std::cout << "This action seems to be umpossible, please take a closer look" << std::endl;
