@@ -8,6 +8,8 @@ This is only a simple version of the game, with a single player and a single AI 
 The player and the AI can move in four directions and place bombs to destroy walls and kill the enemy.
 
 This implementation is a turn-based game, The player moves first, then the AI moves and then the bombs explode.
+The spawn points at the begining of a game are random but player is always in black and the AI in red.
+Destroying walls can reveal power-ups that can increase the player's bomb range or the number of bombs that can be placed at once.
 
 ## Installation
 
