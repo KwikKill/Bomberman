@@ -3,7 +3,7 @@
 ## Introduction
 
 This project is a simple implementation of the Bomberman game for the AI for Games course at INSA Rennes.
-The game is implemented in C++ and uses the SFML library for the graphical interface.
+The game is implemented in C++, uses the SFML library for the graphical interface and was writtend from scratch.
 This is only a simple version of the game, with a single player and a single AI enemy.
 The player and the AI can move in four directions and place bombs to destroy walls and kill the enemy.
 
@@ -37,15 +37,19 @@ The available maps are stored in the `assets/levels` folder, stored in plain tex
 
 ## AI implementation
 
-The game AI uses Monte-Carlo tree search (MCTS) to run simulations of the game and choose the move with the best outcome.
+The game AI uses Monte-Carlo tree search (MCTS) with UCB1 pruning to choose the move with the best outcome based on random simulations.
 
 We settled on 1000 simulations on each turn as it gave us good results while still being playable realtime (about 0.7 sec of waiting after your turn on our machine).
 
-The AI logic is written in `src/MCTS.cpp` and `src/MCTS.hpp`, some parameters (such as the simulation count) are editable there. 
+The AI logic is written in [`src/MCTS.cpp`](src/MCTS.cpp) and [`src/MCTS.h`](src/MCTS.h), some parameters (such as the simulation count) are editable there.
 
-A few optimizations are implemented on top of the base algorithm to provide better performance:
+A few optimizations were implemented on top of the base algorithm to provide better performance:
 - Keeping the search tree across several turns, by removing the paths that were not chosen between turns.
-- Marking nodes when all subpaths are expanded and storing it's value.
+- Marking nodes when all subpaths are expanded and storing it's value to avoid re-computing it.
+- Minizing the number of copies of the game state by using pointers and references as much as possible.
+- Using a [`fast log`](src/fast_log.cpp) function to compute the logarithm in the UCB1 formula.
+
+The MCTS class is initialized with the current game state and the [`findBestAction`](src/MCTS.cpp#L244) method is called to get the best move for the AI each time. 
 
 ## Authors
 
