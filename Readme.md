@@ -12,7 +12,7 @@ This implementation is a turn-based game, The player moves first, then the AI mo
 ## Installation
 
 To compile the game, you need to have the SFML library installed on your computer.
-You need to have the `PATH_TO_FFML` environment variable set to the SFML library on your computer.
+You need to have the `PATH_TO_SFML` environment variable set to the SFML library on your computer.
 A copy of the library is provided in the `SFML-2.6.1` folder.
 
 To compile the game, you can use the provided `Makefile` by running the following command in the terminal:
@@ -33,7 +33,19 @@ To run the game, you can use the following command:
 
 The game will start and you can use the arrow keys to move the player, the space key to place a bomb and the AI will move automatically.
 You can change the map by providing a map ID as an argument to the program.
-The available maps are stored in the `assets/levels` folder.
+The available maps are stored in the `assets/levels` folder, stored in plain text and parsed at runtime.
+
+## AI implementation
+
+The game AI uses Monte-Carlo tree search (MCTS) to run simulations of the game and choose the move with the best outcome.
+
+We settled on 1000 simulations on each turn as it gave us good results while still being playable realtime (about 0.7 sec of waiting after your turn on our machine).
+
+The AI logic is written in `src/MCTS.cpp` and `src/MCTS.hpp`, some parameters (such as the simulation count) are editable there. 
+
+A few optimizations are implemented on top of the base algorithm to provide better performance:
+- Keeping the search tree across several turns, by removing the paths that were not chosen between turns.
+- Marking nodes when all subpaths are expanded and storing it's value.
 
 ## Authors
 
