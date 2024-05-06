@@ -1,5 +1,5 @@
-#ifndef MCST_H
-#define MCST_H
+#ifndef MCTS_H
+#define MCTS_H
 
 #include "Player.h"
 #include "GameState.h"
@@ -22,4 +22,4 @@ public:
     bool isInitialized() const { return root != nullptr; }
 };
 
-#endif // MCST_H
+#endif // MCTS_H

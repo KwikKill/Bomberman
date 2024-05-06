@@ -2,7 +2,7 @@
 #include "Node.h"
 #include "MCTS.h"
 #include "Bomb.h"
-#include "fast_log.hpp"
+#include "fast_log.h"
 
 #include <cmath>
 #include <iostream>
@@ -296,7 +296,7 @@ void MCTS::nextSimulation(Action action) {
     
 
     // If the child node is not found
-    std::cout << "This action seems to be umpossible, please take a closer look" << std::endl;
+    std::cout << "This action seems to be impossible, please take a closer look" << std::endl;
     std::cout << "Action: " << action << std::endl;
     log_tree(root);
     exit(1);

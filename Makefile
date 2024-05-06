@@ -30,7 +30,7 @@ BIN = $(BIN_DIR)/main
 
 .PHONY: all clean
 
-all: $(BIN)
+all: makedirs $(BIN)
 
 debug: CXXFLAGS += -g -pg -fprofile-arcs -ftest-coverage
 debug: CXXFLAGS := $(filter-out -O3,$(CXXFLAGS))
@@ -42,6 +42,9 @@ $(BIN): $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+makedirs:
+	@-mkdir -p $(OBJ_DIR) $(BIN_DIR)
 
 clean:
 	rm -f $(OBJS) $(BIN)

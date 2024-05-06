@@ -1,4 +1,4 @@
-#include "fast_log.hpp"
+#include "fast_log.h"
 #include <cassert>
 #include <limits>
 
